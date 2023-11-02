@@ -8,8 +8,13 @@ COMMANDS = [
     "hello",
     "close",
     "help",
-    "add_contact name address phone email birthday(DD.MM.YYYY)",
-    "change_contact name address phone email birthday(DD.MM.YYYY)",
+    "add_contact name phone",
+    "add_address name address",
+    "add_email name email",
+    "add_birthday name birthday(DD.MM.YYYY)",
+    "change_address name new_address",
+    "change_email name new_email",
+    "change_contact_phone name phone",
     "delete_contact name",
     "all_contacts",
     "find_contact name || address || phone || email || birthday(DD.MM.YYYY)",
@@ -79,13 +84,13 @@ def add_contact(args):
 
 
 @_input_error
-def change_contact(args):
+def change_contact_phone(args):
     name, phone = args
     contact = contacts.find(name)
     res = contact.edit_phone(phone)
     print(res)
-    
-    
+
+
 @_input_error
 def delete_contact(args):
     name = args[0]
@@ -94,8 +99,14 @@ def delete_contact(args):
 
 @_input_error
 def find_contact(args):
-    key = args[0]
-    print(key)  # Test print | Clean after
+    name = args[0]
+    found_contacts = contacts.search_contacts(name)
+    if found_contacts:
+        for contact in found_contacts:
+            print(contact)
+    else:
+        print("No contacts found.")
+
 
 @_input_error
 def add_address(args):
@@ -104,7 +115,7 @@ def add_address(args):
     record.add_address(address)
     contacts.add_record(record)
     print("Contact updated.")
-    
+
 
 @_input_error
 def change_address(args):
@@ -113,12 +124,24 @@ def change_address(args):
     res = contact.edit_address(address)
     print(res)
 
+
+@_input_error
 def add_email(args):
     name, email = args
     record = Record(name)
     record.add_email(email)
     contacts.add_record(record)
-    print("Contact updated.")
+    print("Email updated.")
+
+
+@_input_error
+def add_birthday(args):
+    name, birthday = args
+    record = Record(name)
+    record.add_birthday(birthday)
+    contacts.add_record(record)
+    print("Birthday updated.")
+
 
 @_input_error
 def change_email(args):
@@ -127,15 +150,6 @@ def change_email(args):
     res = contact.edit_email(email)
     print(res)
 
-@_input_error
-def search_contacts(args):
-    name = args[0]
-    found_contacts = contacts.search_contacts(name)
-    if found_contacts:
-        for contact in found_contacts:
-            print(contact)
-    else:
-        print("No contacts found.")
 
 @_input_error
 def all_contacts():
@@ -257,7 +271,9 @@ def main():
         #     "Enter a command: ", completer=COMMANDS_TEST, complete_while_typing=False
         # )
         # Advanced version for Tab Autocomplete
-        user_input = input("Enter a command: ")  # Basic version for Testing
+
+        user_input = input("Enter a command: ")
+        # Basic version for Testing
         command, *args = _parse_input(user_input)
 
         if command in ["good bye", "close", "exit"]:
@@ -269,24 +285,24 @@ def main():
             helpBot()
         elif command == "add_contact":
             add_contact(args)
+        elif command == "add_birthday":
+            add_birthday(args)
         elif command == "delete_contact":
             delete_contact(args)
-        elif command == "change_contact":
-            change_contact(args)
+        elif command == "change_contact_phone":
+            change_contact_phone(args)
         elif command == "find_contact":
             find_contact(args)
         elif command == "all_contacts":
             all_contacts()
-        elif command == "add-address":
+        elif command == "add_address":
             add_address(args)
-        elif command == "change-address":
+        elif command == "change_address":
             change_address(args)
-        elif command == "add-email":
+        elif command == "add_email":
             add_email(args)
-        elif command == "change-email":
-            change_email(args)           
-        elif command == "search":
-            search_contacts(args) 
+        elif command == "change_email":
+            change_email(args)
         elif command == "find_notes":
             find_notes(args)
         elif command == "add_note":
