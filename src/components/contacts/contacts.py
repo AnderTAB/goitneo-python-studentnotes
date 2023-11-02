@@ -31,6 +31,7 @@ class Phone(Field):
         else:
             raise ValueError("Invalid phone number")
 
+
 class Email(Field):
     def __init__(self, value):
         if self.is_valid(value):
@@ -40,9 +41,10 @@ class Email(Field):
 
     @staticmethod
     def is_valid(value):
-# Регулярний вираз для перевірки дійсності адреси електронної пошти
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        # Регулярний вираз для перевірки дійсності адреси електронної пошти
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(email_pattern, value) is not None
+
 
 class Address(Field):
     def __init__(self, value):
@@ -53,8 +55,8 @@ class Address(Field):
 
     @staticmethod
     def is_valid2(value):
-# Регулярний вираз для перевірки дійсності адреси 
-        street_pattern = r'^[A-Za-z0-9\s.-]+$'
+        # Регулярний вираз для перевірки дійсності адреси
+        street_pattern = r"^[A-Za-z0-9\s.-]+$"
         return re.match(street_pattern, value) is not None
 
 
@@ -74,7 +76,7 @@ class Birthday(Field):
             return self.value > other.value
 
 
-class Record:
+class RecordContact:
     def __init__(self, name, address=None, email=None):
         self.name = Name(name)
         self.phone = ""
@@ -102,8 +104,6 @@ class Record:
     def edit_email(self, new_email):
         self.email = new_email
         return f"Email updated to {new_email}"
-    
-    
 
     def __str__(self):
         return (
@@ -147,7 +147,7 @@ class AddressBook(UserDict):
                         birthday = f"{date[2]}.{date[1]}.{date[0]}"
                     else:
                         birthday = None
-                    record = Record(key)
+                    record = RecordContact(key)
                     record.add_phone(self.phone)
                     if birthday != None:
                         record.birthday = Birthday(birthday)
@@ -209,17 +209,17 @@ class AddressBook(UserDict):
             res += f"{day}: {', '.join(map(str, names))}\n"
         return res
 
-# пошук контакту за будь якою інформацією, поки не працює до кінця хзз чому
+    # пошук контакту за будь якою інформацією, поки не працює до кінця хзз чому
     def search_contacts(self, query):
         found_contacts = []
         query = query.lower()
         for name, contact in self.data.items():
             contact_info = {
-                'name': contact.name.value.lower(),
-                'phone': contact.phone.value,
-                'birthday': contact.birthday,
-                'address': contact.address.value,
-                'email': contact.email.value,
+                "name": contact.name.value.lower(),
+                "phone": contact.phone.value,
+                "birthday": contact.birthday,
+                "address": contact.address.value,
+                "email": contact.email.value,
             }
             if query in contact_info.values():
                 found_contacts.append(contact)

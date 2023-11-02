@@ -1,8 +1,8 @@
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
-from components.notes.notes import Record, NoteData
-from components.contacts.contacts import AddressBook
+from components.notes.notes import RecordNote, NoteData
+from components.contacts.contacts import RecordContact, AddressBook
 
 COMMANDS = [
     "hello",
@@ -44,6 +44,8 @@ FILENAME_NOTES = "data.csv"
 def _parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
+    if len(args) < 1:
+        print("Error: Command is missing required arguments.")
     return cmd, *args
 
 
@@ -51,10 +53,16 @@ def _input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except ValueError as e:
-            return e
-        except TypeError as e:
-            return e
+        except ValueError:
+            print("Wrong count of arguments")
+        except TypeError:
+            print("TypeError")
+        except IndexError:
+            print("IndexError")
+        except AttributeError:
+            print("AttributeError")
+        except:
+            print("Unknow Error")
 
     return inner
 
@@ -77,7 +85,7 @@ def helpBot():
 @_input_error
 def add_contact(args):
     name, phone = args
-    record = Record(name)
+    record = RecordContact(name)
     record.add_phone(phone)
     contacts.add_record(record)
     print("Contact added.")
@@ -94,7 +102,8 @@ def change_contact_phone(args):
 @_input_error
 def delete_contact(args):
     name = args[0]
-    print(name)  # Test print | Clean after
+
+    print(name)
 
 
 @_input_error
@@ -111,9 +120,8 @@ def find_contact(args):
 @_input_error
 def add_address(args):
     name, address = args
-    record = Record(name)
-    record.add_address(address)
-    contacts.add_record(record)
+    contact = contacts.find(name)
+    contact.add_address(address)
     print("Contact updated.")
 
 
@@ -128,18 +136,18 @@ def change_address(args):
 @_input_error
 def add_email(args):
     name, email = args
-    record = Record(name)
-    record.add_email(email)
-    contacts.add_record(record)
+
+    contact = contacts.find(name)
+    contact.add_email(email)
+
     print("Email updated.")
 
 
 @_input_error
 def add_birthday(args):
     name, birthday = args
-    record = Record(name)
-    record.add_birthday(birthday)
-    contacts.add_record(record)
+    contact = contacts.find(name)
+    contact.add_birthday(birthday)
     print("Birthday updated.")
 
 
@@ -160,7 +168,6 @@ def all_contacts():
 def contacts_birthdays(args):
     days = int(args[0])
     birthdays = contacts.birthdays(days)
-    print(days)  # Test print | Clean after
     print(birthdays)
 
 
@@ -169,36 +176,35 @@ def find_notes(args):
     key = args[0]
 
     # Code
-
     print(key)  # Test print | Clean after
 
 
 @_input_error
 def add_note(args):
     TITLE, text, *tags = args
-    record = Record()
+
+    record = RecordNote()
     record.add_title(TITLE)
     record.add_note(text)
     record.add_tag(tags)
     notes.add_record(record)
-    print(TITLE, text, *tags)  # Test print | Clean after
+    print("Note added")
 
 
 @_input_error
 def delete_note(args):
     TITLE = args[0]
+
     notes.delete(TITLE)
-    print(TITLE)  # Test print | Clean after
+    print("Note deleted")
 
 
 @_input_error
 def change_note_title(args):
     TITLE, NEW_TITLE = args
-
     note = notes.find_note(TITLE)
     note.edit_title(NEW_TITLE)
-
-    print(TITLE, NEW_TITLE)  # Test print | Clean after
+    print("Note Title changed")
 
 
 @_input_error
@@ -207,8 +213,7 @@ def change_note_text(args):
 
     note = notes.find_note(TITLE)
     note.edit_note(new_text)
-
-    print(TITLE, new_text)  # Test print | Clean after
+    print("Note text changed")
 
 
 @_input_error
@@ -217,46 +222,36 @@ def add_note_tags(args):
 
     note = notes.find_note(TITLE)
     note.add_tag(tags)
-
-    print(TITLE, *tags)  # Test print | Clean after
+    print("Note added")
 
 
 @_input_error
 def delete_note_tag(args):
     TITLE, tag = args
-
     note = notes.find_note(TITLE)
     note.del_tag(tag)
-
-    print(TITLE, tag)  # Test print | Clean after
+    print("Note tag deleted")
 
 
 @_input_error
 def change_note_tag(args):
     TITLE, tag, new_tag = args
-
     note = notes.find_note(TITLE)
     note.edit_tag(tag, new_tag)
-
-    print(TITLE, tag, new_tag)  # Test print | Clean after
+    print("Note tag changed")
 
 
 @_input_error
 def find_note_tag(args):
     tags = args
-
-    notes.find_note_by_tag(tags)
-
-    print(tags)  # Test print | Clean after
+    res = notes.find_note_by_tag(tags)
+    print(res)
 
 
 @_input_error
 def sort_note_tag(args):
     tags = args
-
-    # Code
-
-    print(tags)  # Test print | Clean after
+    print(tags)
 
 
 def main():
