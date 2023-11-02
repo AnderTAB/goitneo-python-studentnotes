@@ -33,7 +33,7 @@ class ID(Field):
         self.text = str(id)
 
 
-class Record:
+class RecordNote:
     current_id = int(1)
 
     def __init__(self):
@@ -42,21 +42,21 @@ class Record:
         self.note = None
         self.notebook = NoteData()
         self.date = datetime.now().strftime("%d.%m.%Y %H:%M")
-        if Record.current_id not in self.notebook.get_id_list():
-            self.id = ID(Record.current_id)
+        if RecordNote.current_id not in self.notebook.get_id_list():
+            self.id = ID(RecordNote.current_id)
         else:
-            Record.current_id = int(max(self.notebook.get_id_list())) + 1
-            self.id = ID(Record.current_id)
-        Record.current_id += 1
+            RecordNote.current_id = int(max(self.notebook.get_id_list())) + 1
+            self.id = ID(RecordNote.current_id)
+        RecordNote.current_id += 1
 
     def add_id(self, id):
         if id not in self.notebook.get_id_list():
-            Record.current_id = id
-            self.id = ID(Record.current_id)
+            RecordNote.current_id = id
+            self.id = ID(RecordNote.current_id)
         else:
-            Record.current_id = int(max(self.notebook.get_id_list())) + 1
-            self.id = ID(Record.current_id)
-        Record.current_id += 1
+            RecordNote.current_id = int(max(self.notebook.get_id_list())) + 1
+            self.id = ID(RecordNote.current_id)
+        RecordNote.current_id += 1
 
     def add_title(self, title):
         self.title = Title(title)
@@ -290,7 +290,7 @@ class NoteData(UserDict):
         for note in note_data:
             for key, value in note.items():
                 if key == "title":
-                    record = Record()
+                    record = RecordNote()
                     record.add_title(value)
                 if key == "id":
                     record.add_id(int(value))
@@ -328,7 +328,7 @@ class NoteData(UserDict):
 if __name__ == "__main__":
     notebook = NoteData()  # create user dict object
     notebook.read_csv_file("data.csv")  # read csv data
-    first_notation = Record()  # create record object
+    first_notation = RecordNote()  # create record object
     first_notation.add_title("SOME TASK")  # add title to created object
     first_notation.add_note("Some text")  # add note to creted object
     first_notation.add_tag("#Lab, #20")  # add tags to object
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     #    print(first_notation)
 
     # create another record object
-    first_notation = Record()
+    first_notation = RecordNote()
 
     # To create a record automatically with the title in uppercase,
     # tags with only '#' symbols, and the note containing the rest of the text
@@ -351,7 +351,7 @@ if __name__ == "__main__":
     notebook.add_record(first_notation)  # add record to user dict
 
     # To create a similar object with a different ID
-    some_notataion = Record()
+    some_notataion = RecordNote()
     some_notataion.create_record(
         """
                                  PROJECT SUBMISSION FOR HYDRODYNAMICS #PAKHT, #LABA, #20POINTS
@@ -360,7 +360,7 @@ if __name__ == "__main__":
     )
     notebook.add_record(some_notataion)
 
-    second_notation = Record()
+    second_notation = RecordNote()
     second_notation.create_record(
         """LIST TO DO #koliu, #goit not so important 5463899"""
     )
