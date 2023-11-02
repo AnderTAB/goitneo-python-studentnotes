@@ -1,29 +1,51 @@
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
+
+from components.notes.notes import RecordNote, NoteData
+from components.contacts.contacts import RecordContact, AddressBook
+
 COMMANDS = [
     "hello",
     "close",
     "help",
-    "add-contact (add-contact name address phone email birthday(DD.MM.YYYY))",
-    "change-contact (change-contact name)",
-    "delete-contact (delete-contact name)",
-    "all-contacts",
-    "find-contact (find-contact name or address or phone or email or birthday(DD.MM.YYYY))",
-    "contacts-birthdays (contacts-birthdays days(int))",
-    "find-notes (find-notes TITLE or text or date)",
-    "add-note (add-note TITLE text date))",
-    "delete-note (delete-note TITLE)",
-    "change-note-title (change-note TITLE NEW_TITLE)",
-    "change-note-title (change-note TITLE new_text)",
-    "add-note-tags (add-note-tags *your tags*)",
-    "delete-note-tag (delete-note TITLE Tag)",
-    "change-note-tag (change-note-tag tag new_tag)",
-    "find-note-tag (find-note-tag *your tags*)",
-    "sort-note-tag (find-note-tag *your tags*)",
+    "add_contact name phone",
+    "add_address name address",
+    "add_email name email",
+    "add_birthday name birthday(DD.MM.YYYY)",
+    "change_address name new_address",
+    "change_email name new_email",
+    "change_contact_phone name phone",
+    "delete_contact name",
+    "all_contacts",
+    "find_contact name || address || phone || email || birthday(DD.MM.YYYY)",
+    "contacts_birthdays days(int)",
+    "find_notes TITLE || text || date",
+    "add_note TITLE text *your #tags*",
+    "delete_note TITLE",
+    "change_note_title TITLE NEW_TITLE",
+    "change_note_text TITLE new_text",
+    "add_note_tags TITLE *your tags*",
+    "delete_note_tag TITLE #Tag",
+    "change_note_tag TITLE #tag #new_tag",
+    "find_note_tag *your #tags*",
+    "sort_note_tag *your #tags*",
 ]
+COMMANDS_TEST = WordCompleter(
+    COMMANDS,
+    ignore_case=True,
+)
+
+contacts = AddressBook()
+notes = NoteData()
+FILENAME_CONTACTS = "data.json"
+FILENAME_NOTES = "data.csv"
 
 
 def _parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
+    if len(args) < 1:
+        print("Error: Command is missing required arguments.")
     return cmd, *args
 
 
@@ -31,15 +53,23 @@ def _input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except ValueError as e:
-            return e
-        except TypeError as e:
-            return e
+        except ValueError:
+            print("Wrong count of arguments")
+        except TypeError:
+            print("TypeError")
+        except IndexError:
+            print("IndexError")
+        except AttributeError:
+            print("AttributeError")
+        except:
+            print("Unknow Error")
 
     return inner
 
 
 def close_bot():
+    contacts.save_to_file(FILENAME_CONTACTS)
+    notes.write_csv_file(FILENAME_NOTES)
     print("Good bye!")
 
 
@@ -54,113 +84,191 @@ def helpBot():
 
 @_input_error
 def add_contact(args):
-    name, address, phone, email, birthday = args
-    print(name, address, phone, email, birthday)
+    name, phone = args
+    record = RecordContact(name)
+    record.add_phone(phone)
+    contacts.add_record(record)
+    print("Contact added.")
 
 
 @_input_error
-def change_contact(args):
-    name, address, phone, email, birthday = args
-    print(name, address, phone, email, birthday)
+def change_contact_phone(args):
+    name, phone = args
+    contact = contacts.find(name)
+    res = contact.edit_phone(phone)
+    print(res)
 
 
 @_input_error
 def delete_contact(args):
     name = args[0]
+
     print(name)
 
 
 @_input_error
 def find_contact(args):
-    key = args[0]
-    print(key)
+    name = args[0]
+    found_contacts = contacts.search_contacts(name)
+    if found_contacts:
+        for contact in found_contacts:
+            print(contact)
+    else:
+        print("No contacts found.")
+
+
+@_input_error
+def add_address(args):
+    name, address = args
+    contact = contacts.find(name)
+    contact.add_address(address)
+    print("Contact updated.")
+
+
+@_input_error
+def change_address(args):
+    name, address = args
+    contact = contacts.find(name)
+    res = contact.edit_address(address)
+    print(res)
+
+
+@_input_error
+def add_email(args):
+    name, email = args
+
+    contact = contacts.find(name)
+    contact.add_email(email)
+
+    print("Email updated.")
+
+
+@_input_error
+def add_birthday(args):
+    name, birthday = args
+    contact = contacts.find(name)
+    contact.add_birthday(birthday)
+    print("Birthday updated.")
+
+
+@_input_error
+def change_email(args):
+    name, email = args
+    contact = contacts.find(name)
+    res = contact.edit_email(email)
+    print(res)
 
 
 @_input_error
 def all_contacts():
-    print("All Contacts")
+    print("All Contacts")  # Test print | Clean after
 
 
 @_input_error
 def contacts_birthdays(args):
-    days = args[0]
-    print(days)
+    days = int(args[0])
+    birthdays = contacts.birthdays(days)
+    print(birthdays)
 
 
 @_input_error
 def find_notes(args):
     key = args[0]
-    print(key)
+
+    # Code
+    print(key)  # Test print | Clean after
 
 
 @_input_error
 def add_note(args):
-    TITLE, text, date = args
-    print(TITLE, text, date)
+    TITLE, text, *tags = args
+
+    record = RecordNote()
+    record.add_title(TITLE)
+    record.add_note(text)
+    record.add_tag(tags)
+    notes.add_record(record)
+    print("Note added")
 
 
 @_input_error
 def delete_note(args):
     TITLE = args[0]
 
-    print(TITLE)
+    notes.delete(TITLE)
+    print("Note deleted")
 
 
 @_input_error
 def change_note_title(args):
     TITLE, NEW_TITLE = args
-
-    print(TITLE, NEW_TITLE)
+    note = notes.find_note(TITLE)
+    note.edit_title(NEW_TITLE)
+    print("Note Title changed")
 
 
 @_input_error
 def change_note_text(args):
     TITLE, new_text = args
 
-    print(TITLE, new_text)
+    note = notes.find_note(TITLE)
+    note.edit_note(new_text)
+    print("Note text changed")
 
 
 @_input_error
 def add_note_tags(args):
     TITLE, *tags = args
 
-    print(TITLE, *tags)
+    note = notes.find_note(TITLE)
+    note.add_tag(tags)
+    print("Note added")
 
 
 @_input_error
 def delete_note_tag(args):
     TITLE, tag = args
-
-    print(TITLE, tag)
+    note = notes.find_note(TITLE)
+    note.del_tag(tag)
+    print("Note tag deleted")
 
 
 @_input_error
 def change_note_tag(args):
     TITLE, tag, new_tag = args
-
-    print(TITLE, tag, new_tag)
+    note = notes.find_note(TITLE)
+    note.edit_tag(tag, new_tag)
+    print("Note tag changed")
 
 
 @_input_error
 def find_note_tag(args):
     tags = args
-
-    print(tags)
+    res = notes.find_note_by_tag(tags)
+    print(res)
 
 
 @_input_error
 def sort_note_tag(args):
     tags = args
-
     print(tags)
 
 
 def main():
+    contacts.read_from_file(FILENAME_CONTACTS)
+    notes.read_csv_file(FILENAME_NOTES)
+
     msg = "\n==============================\nWelcome to the assistant bot!\n\nI will help you with your student activity.\n==============================\n"
     print(msg)
 
     while True:
+        # user_input = prompt(
+        #     "Enter a command: ", completer=COMMANDS_TEST, complete_while_typing=False
+        # )
+        # Advanced version for Tab Autocomplete
+
         user_input = input("Enter a command: ")
+        # Basic version for Testing
         command, *args = _parse_input(user_input)
 
         if command in ["good bye", "close", "exit"]:
@@ -170,37 +278,47 @@ def main():
             helloBot()
         elif command == "help":
             helpBot()
-        elif command == "add-contact":
+        elif command == "add_contact":
             add_contact(args)
-        elif command == "delete-contact":
+        elif command == "add_birthday":
+            add_birthday(args)
+        elif command == "delete_contact":
             delete_contact(args)
-        elif command == "change-contact":
-            change_contact(args)
-        elif command == "find-contact":
+        elif command == "change_contact_phone":
+            change_contact_phone(args)
+        elif command == "find_contact":
             find_contact(args)
-        elif command == "all-contacts":
+        elif command == "all_contacts":
             all_contacts()
-        elif command == "find-notes":
+        elif command == "add_address":
+            add_address(args)
+        elif command == "change_address":
+            change_address(args)
+        elif command == "add_email":
+            add_email(args)
+        elif command == "change_email":
+            change_email(args)
+        elif command == "find_notes":
             find_notes(args)
-        elif command == "add-note":
+        elif command == "add_note":
             add_note(args)
-        elif command == "delete-note":
+        elif command == "delete_note":
             delete_note(args)
-        elif command == "change-note-title":
+        elif command == "change_note_title":
             change_note_title(args)
-        elif command == "change-note-text":
+        elif command == "change_note_text":
             change_note_text(args)
-        elif command == "add-note-tags":
+        elif command == "add_note_tags":
             add_note_tags(args)
-        elif command == "delete-note-tag":
+        elif command == "delete_note_tag":
             delete_note_tag(args)
-        elif command == "change-note-tag":
+        elif command == "change_note_tag":
             change_note_tag(args)
-        elif command == "find-note-tag":
+        elif command == "find_note_tag":
             find_note_tag(args)
-        elif command == "sort-note-tag":
+        elif command == "sort_note_tag":
             sort_note_tag(args)
-        elif command == "contacts-birthdays":
+        elif command == "contacts_birthdays":
             contacts_birthdays(args)
         else:
             print("Invalid command.")
