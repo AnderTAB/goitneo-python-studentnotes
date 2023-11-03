@@ -4,6 +4,10 @@ import json
 import os.path
 import re
 
+from colorama import *
+
+init(autoreset=True)
+
 
 class Field:
     def __init__(self, value):
@@ -29,7 +33,7 @@ class Phone(Field):
         if value.isdigit() and len(value) == 10:
             super().__init__(value)
         else:
-            raise ValueError("Invalid phone number")
+            raise ValueError(Fore.RED + "Invalid phone number")
 
 
 class Email(Field):
@@ -37,7 +41,7 @@ class Email(Field):
         if self.is_valid(value):
             super().__init__(value)
         else:
-            raise ValueError("Invalid email address")
+            raise ValueError(Fore.RED + "Invalid email address")
 
     @staticmethod
     def is_valid(value):
@@ -51,7 +55,7 @@ class Address(Field):
         if self.is_valid2(value):
             super().__init__(value)
         else:
-            raise ValueError("Invalid address")
+            raise ValueError(Fore.RED + "Invalid address")
 
     @staticmethod
     def is_valid2(value):
@@ -106,18 +110,15 @@ class RecordContact:
         return f"Email updated to {new_email}"
 
     def __str__(self):
-        return (
-            f"Contact name: {self.name}, phone: {self.phone}, birthday: {self.birthday}"
-        )
+        return f"Contact name: {self.name}, address: {self.address}, phone: {self.phone}, email: {self.email}, birthday: {self.birthday}"
 
 
 class AddressBook(UserDict):
     def __init__(self):
         self.data = {}
 
-    def save_to_file(self, filename):
-        filename = "bd.json"
-
+    def save_to_file(self, file):
+        filename = os.path.abspath(f"src/db/contacts/{file}")
         if os.path.exists(filename) == False:
             with open(filename, "w") as file:
                 bd = {}
@@ -129,26 +130,37 @@ class AddressBook(UserDict):
             for el in self.data:
                 res = str(self.data[el]).replace(",", "").split()
                 data[res[2]] = [
-                    {"address": "", "phone": res[4], "email": "", "birthdate": res[6]}
+                    {
+                        "address": res[4],
+                        "phone": res[6],
+                        "email": res[8],
+                        "birthdate": res[10],
+                    }
                 ]
 
         with open(filename, "w") as file:
             json.dump(data, file, indent=2)
 
-    def read_from_file(self, filename):
+    def read_from_file(self, file):
+        filename = os.path.abspath(f"src/db/contacts/{file}")
         try:
-            with open(filename, "r") as file:
+            with open(filename) as file:
                 data = json.load(file)
                 for key, value in data.items():
                     self.name = key
+                    self.address = value[0]["address"]
                     self.phone = value[0]["phone"]
+                    email = value[0]["email"]
                     if value[0]["birthdate"] != "None":
                         date = str(value[0]["birthdate"]).split("-")
                         birthday = f"{date[2]}.{date[1]}.{date[0]}"
                     else:
                         birthday = None
                     record = RecordContact(key)
+                    record.add_address(self.address)
                     record.add_phone(self.phone)
+                    if email != None:
+                        record.email = email
                     if birthday != None:
                         record.birthday = Birthday(birthday)
                     self.data[key] = record
@@ -164,13 +176,13 @@ class AddressBook(UserDict):
         if res:
             return res
         else:
-            raise ValueError("Contact not found")
+            raise ValueError(Fore.RED + "Contact not found")
 
     def add_birthday(self, name, birthday):
         try:
             contact = self.find(name)
         except ValueError:
-            print("Contact not found")
+            print(Fore.RED + "Contact not found")
         else:
             contact.birthday = Birthday(birthday)
             print("Birthday added.")
@@ -180,7 +192,7 @@ class AddressBook(UserDict):
             if i == name:
                 return self.data[i].birthday
             else:
-                raise ValueError("Contact not found")
+                raise ValueError(Fore.RED + "Contact not found")
 
     def birthdays(self, diff):
         birthday_dict = {}
@@ -204,7 +216,7 @@ class AddressBook(UserDict):
                 else:
                     birthday_dict[weekday] = [user.name]
 
-        res = "\nAll Birthdays:\n"
+        res = Fore.MAGENTA + "\nAll Birthdays:\n" + Fore.WHITE
         for day, names in birthday_dict.items():
             res += f"{day}: {', '.join(map(str, names))}\n"
         return res

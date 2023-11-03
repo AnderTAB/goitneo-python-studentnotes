@@ -131,5 +131,5 @@ dist
 
 
 __pycache__
-
-data.json
+contacts.json
+notes.csv

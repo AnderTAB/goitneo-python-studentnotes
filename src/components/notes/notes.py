@@ -283,36 +283,39 @@ class NoteData(UserDict):
     def read_csv_file(self, file):
         # script_dir = "\\".join(os.path.dirname(__file__).split("\\")[:-3])
         file = os.path.abspath(f"src/db/notes/{file}")
-        with open(file, "r") as f:
-            dict_reader = DictReader(f, delimiter=";")
-            note_data = list(dict_reader)
+        try:
+            with open(file, "r") as f:
+                dict_reader = DictReader(f, delimiter=";")
+                note_data = list(dict_reader)
 
-        for note in note_data:
-            for key, value in note.items():
-                if key == "title":
-                    record = RecordNote()
-                    record.add_title(value)
-                if key == "id":
-                    record.add_id(int(value))
-                elif key == "tag":
-                    if len(value.split(",")) > 1:
-                        for v in value.split(","):
-                            record.add_tag(v.strip())
-                    else:
-                        record.add_tag(value)
-                elif key == "note":
-                    if note[key]:
-                        record.add_note(value)
+            for note in note_data:
+                for key, value in note.items():
+                    if key == "title":
+                        record = RecordNote()
+                        record.add_title(value)
+                    if key == "id":
+                        record.add_id(int(value))
+                    elif key == "tag":
+                        if len(value.split(",")) > 1:
+                            for v in value.split(","):
+                                record.add_tag(v.strip())
+                        else:
+                            record.add_tag(value)
+                    elif key == "note":
+                        if note[key]:
+                            record.add_note(value)
+                        else:
+                            continue
+                    elif key == "date":
+                        if note[key]:
+                            record.date = value
+                        else:
+                            continue
                     else:
                         continue
-                elif key == "date":
-                    if note[key]:
-                        record.date = value
-                    else:
-                        continue
-                else:
-                    continue
-                self.add_record(record)
+                    self.add_record(record)
+        except FileNotFoundError:
+            self.data = {}
 
     def write_csv_file(self, file):
         # script_dir = "\\".join(os.path.dirname(__file__).split("\\")[:-3])

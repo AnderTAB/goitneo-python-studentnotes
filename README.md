@@ -7,6 +7,7 @@
 
 Пакеты:
 
-1. pip install prompt_toolkit
+1. py -m pip install prompt_toolkit
+2. py -m pip install colorama
 
 Функционал: 0. При нажатии "Tab" вы можете увидеть список всех команд, а также, после ввода части команды и нажатия "Tab" можете увидеть в консоли ближайшие совпадения.
