@@ -66,8 +66,8 @@ class RecordNote:
             for t in tags:
                 if t not in [t.text for t in self.tag]:
                     self.tag.append(Tag(t))
-        elif isinstance(tags, str) and len(re.findall(r"#\w+", tags)) > 1:
-            for t in re.findall(r"#\w+", tags):
+        elif isinstance(tags, str) and len(re.findall(r"\w+", tags)) > 1:
+            for t in re.findall(r"\w+", tags):
                 if t not in [t.text for t in self.tag]:
                     self.tag.append(Tag(t))
         else:
@@ -235,7 +235,7 @@ class NoteData(UserDict):
                 break
         return result if result is not None else None
 
-    def sort_note_by_tag_amount(self, reverse=False):
+    def sort_note_by_tag_amount(self, reverse=True):
         result = []
         result_dict = {}
         dict_data = self.to_dict()
@@ -283,121 +283,124 @@ class NoteData(UserDict):
     def read_csv_file(self, file):
         # script_dir = "\\".join(os.path.dirname(__file__).split("\\")[:-3])
         file = os.path.abspath(f"src/db/notes/{file}")
-        with open(file, "r") as f:
-            dict_reader = DictReader(f, delimiter=";")
-            note_data = list(dict_reader)
+        try:
+            with open(file, "r") as f:
+                dict_reader = DictReader(f, delimiter=";")
+                note_data = list(dict_reader)
 
-        for note in note_data:
-            for key, value in note.items():
-                if key == "title":
-                    record = RecordNote()
-                    record.add_title(value)
-                if key == "id":
-                    record.add_id(int(value))
-                elif key == "tag":
-                    if len(value.split(",")) > 1:
-                        for v in value.split(","):
-                            record.add_tag(v.strip())
-                    else:
-                        record.add_tag(value)
-                elif key == "note":
-                    if note[key]:
-                        record.add_note(value)
+            for note in note_data:
+                for key, value in note.items():
+                    if key == "title":
+                        record = RecordNote()
+                        record.add_title(value)
+                    if key == "id":
+                        record.add_id(int(value))
+                    elif key == "tag":
+                        if len(value.split(",")) > 1:
+                            for v in value.split(","):
+                                record.add_tag(v.strip())
+                        else:
+                            record.add_tag(value)
+                    elif key == "note":
+                        if note[key]:
+                            record.add_note(value)
+                        else:
+                            continue
+                    elif key == "date":
+                        if note[key]:
+                            record.date = value
+                        else:
+                            continue
                     else:
                         continue
-                elif key == "date":
-                    if note[key]:
-                        record.date = value
-                    else:
-                        continue
-                else:
-                    continue
-                self.add_record(record)
+                    self.add_record(record)
+        except FileNotFoundError:
+            self.data = {}
 
     def write_csv_file(self, file):
         # script_dir = "\\".join(os.path.dirname(__file__).split("\\")[:-3])
         file = os.path.abspath(f"src/db/notes/{file}")
         field_names = ["title", "note", "tag", "date", "id"]
         users_list = self.to_dict()
-        with open(file, "w") as csvfile:
+        with open(file, "w", encoding='utf-8') as csvfile:
             writer = DictWriter(csvfile, fieldnames=field_names, delimiter=";")
             writer.writeheader()
             writer.writerows(users_list)
 
 
-if __name__ == "__main__":
-    notebook = NoteData()  # create user dict object
-    notebook.read_csv_file("data.csv")  # read csv data
-    first_notation = RecordNote()  # create record object
-    first_notation.add_title("SOME TASK")  # add title to created object
-    first_notation.add_note("Some text")  # add note to creted object
-    first_notation.add_tag("#Lab, #20")  # add tags to object
-    first_notation.add_tag("#Lab #20")  # check that tags are not duplicated
-    first_notation.add_tag("#paht")  # add single tag
-    notebook.add_record(first_notation)  # add object to user dict
-    #    print(first_notation)
+# if __name__ == "__main__":
+#     notebook = NoteData()  # create user dict object
+#     notebook.read_csv_file("data.csv")  # read csv data
+#     first_notation = RecordNote()  # create record object
+#     first_notation.add_title("SOME TASK")  # add title to created object
+#     first_notation.add_note("Some text")  # add note to creted object
+#     first_notation.add_tag("#Lab, #20")  # add tags to object
+#     first_notation.add_tag("#Lab #20")  # check that tags are not duplicated
+#     first_notation.add_tag("#paht")  # add single tag
+#     notebook.add_record(first_notation)  # add object to user dict
+#     #    print(first_notation)
 
-    # create another record object
-    first_notation = RecordNote()
+#     # create another record object
+#     first_notation = RecordNote()
 
-    # To create a record automatically with the title in uppercase,
-    # tags with only '#' symbols, and the note containing the rest of the text
-    first_notation.create_record(
-        """
-                                 PROJECT SUBMISSION FOR HYDRODYNAMICS #PAKHT, #LABA, #20POINTS
-                                 It is necessary to complete a project on the topic "......"
-                                 Preliminary defense in the 4th building, room 201..."""
-    )
-    notebook.add_record(first_notation)  # add record to user dict
+#     # To create a record automatically with the title in uppercase,
+#     # tags with only '#' symbols, and the note containing the rest of the text
+#     first_notation.create_record(
+#         """
+#                                  PROJECT SUBMISSION FOR HYDRODYNAMICS #PAKHT, #LABA, #20POINTS
+#                                  It is necessary to complete a project on the topic "......"
+#                                  Preliminary defense in the 4th building, room 201..."""
+#     )
+#     notebook.add_record(first_notation)  # add record to user dict
 
-    # To create a similar object with a different ID
-    some_notataion = RecordNote()
-    some_notataion.create_record(
-        """
-                                 PROJECT SUBMISSION FOR HYDRODYNAMICS #PAKHT, #LABA, #20POINTS
-                                 It is necessary to complete a project on the topic "......"
-                                 Preliminary defense in the 4th building, room 201..."""
-    )
-    notebook.add_record(some_notataion)
+#     # To create a similar object with a different ID
+#     some_notataion = RecordNote()
+#     some_notataion.create_record(
+#         """
+#                                  PROJECT SUBMISSION FOR HYDRODYNAMICS #PAKHT, #LABA, #20POINTS
+#                                  It is necessary to complete a project on the topic "......"
+#                                  Preliminary defense in the 4th building, room 201..."""
+#     )
+#     notebook.add_record(some_notataion)
 
-    second_notation = RecordNote()
-    second_notation.create_record(
-        """LIST TO DO #koliu, #goit not so important 5463899"""
-    )
-    notebook.add_record(second_notation)
+#     second_notation = RecordNote()
+#     second_notation.create_record(
+#         """LIST TO DO #koliu, #goit not so important 5463899"""
+#     )
+#     notebook.add_record(second_notation)
 
-    # To edit a record, the best and safest way is to find the record by its ID.
-    # If it is found, then it can be edited.
-    id_find = notebook.get_note_by_id("3")  #
-    print(id_find)
-    id_find.edit_note("something")
-    print(id_find)
-    id_find.edit_title("nothing")
-    print(id_find)
-    id_find.edit_tag("#window", "#ok")
-    print(id_find)
+#     # To edit a record, the best and safest way is to find the record by its ID.
+#     # If it is found, then it can be edited.
+#     id_find = notebook.get_note_by_id("3")  #
+#     print(id_find)
+#     id_find.edit_note("something")
+#     print(id_find)
+#     id_find.edit_title("nothing")
+#     print(id_find)
+#     id_find.edit_tag("#window", "#ok")
+#     print(id_find)
 
-    # Of course, it could be edited in another way by using a different search options,
-    # but you must be careful since such a search method may return a list.
-    print(notebook.find_note("Almost election."))
-    notebook.delete("Almost election.")  # delete the record
-    print(notebook.find_note("Almost election."))
-    second_find = notebook.find_note("200")
-    for r in second_find:
-        print(str(r))
+#     # Of course, it could be edited in another way by using a different search options,
+#     # but you must be careful since such a search method may return a list.
+#     print(notebook.find_note("Almost election."))
+#     notebook.delete("Almost election.")  # delete the record
+#     print(notebook.find_note("Almost election."))
+#     second_find = notebook.find_note("200")
+#     for r in second_find:
+#         print(str(r))
 
-    # returns all data as dict
-    dict_result = notebook.to_dict()
-    print(dict_result)
+#     # returns all data as dict
+#     dict_result = notebook.to_dict()
+#     print(dict_result)
 
-    # it returns a dictionary created from the object.
-    dict_result = notebook.to_dict(second_find)
-    print(dict_result)
+#     # it returns a dictionary created from the object.
+#     dict_result = notebook.to_dict(second_find)
+#     print(dict_result)
 
-    print(notebook.get_id_list())
+#     print(notebook.get_id_list())
 
-    print("Hier ist the full list: \n")
-    for name, record in notebook.data.items():
-        print(str(record) + "\n")
+#     print("Hier ist the full list: \n")
+#     for name, record in notebook.data.items():
+#         print(str(record) + "\n")
 
-#    notebook.write_csv_file("fake_note_1.csv")
+# #    notebook.write_csv_file("fake_note_1.csv")
