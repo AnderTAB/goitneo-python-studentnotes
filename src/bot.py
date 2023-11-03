@@ -34,6 +34,7 @@ class Bot:
             "all_contacts": self.all_contacts,
             "find_contact": self.find_contact,
             "contacts_birthdays": self.contacts_birthdays,
+            "all_notes": self.all_notes,
             "find_notes": self.find_notes,
             "add_note": self.add_note,
             "delete_note": self.delete_note,
@@ -43,7 +44,7 @@ class Bot:
             "delete_note_tag": self.delete_note_tag,
             "change_note_tag": self.change_note_tag,
             "find_note_tag": self.find_note_tag,
-            "sort_note_tag": self.sort_note_tag,
+            "sort_note_tags": self.sort_note_tags,
         }
         self.commands_help = [
             "hello",
@@ -62,16 +63,17 @@ class Bot:
             "all_contacts",
             "find_contact name || address || phone || email || birthday(DD.MM.YYYY)",
             "contacts_birthdays days(int)",
+            "all_notes",
             "find_notes TITLE || text || date",
-            "add_note TITLE text *your #tags*",
+            "add_note TITLE text #tags",
             "delete_note TITLE",
             "change_note_title TITLE NEW_TITLE",
             "change_note_text TITLE new_text",
-            "add_note_tags TITLE *your tags*",
+            "add_note_tags TITLE #tags",
             "delete_note_tag TITLE #Tag",
             "change_note_tag TITLE #tag #new_tag",
-            "find_note_tag *your #tags*",
-            "sort_note_tag *your #tags*",
+            "find_note_tag #tags",
+            "sort_note_tags",
         ]
 
     def run(self):
@@ -119,6 +121,7 @@ class Bot:
             "exit",
             "help",
             "all_contacts",
+            "all_notes",
         ):
             print(Fore.LIGHTRED_EX + "Error: Command is missing required arguments.")
         return cmd, *args
@@ -170,8 +173,8 @@ class Bot:
     @_input_error
     def delete_contact(self, args):
         name = args[0]
-
-        print(name)
+        # СЩВУ
+        print("Contact deleted")
 
     @_input_error
     def find_contact(self, args):
@@ -210,7 +213,6 @@ class Bot:
     def add_birthday(self, args):
         name, birthday = args
         self.contacts.add_birthday(name, birthday)
-        print("Birthday updated.")
 
     @_input_error
     def change_email(self, args):
@@ -231,9 +233,15 @@ class Bot:
         print(birthdays)
 
     @_input_error
+    def all_notes(self, args):
+        res = self.notes.show_notes()
+        print(res)
+
+    @_input_error
     def find_notes(self, args):
-        key = args[0]
-        # Code
+        key = " ".join(args)
+        res = self.notes.find_note(key)
+        print(res)
 
     @_input_error
     def add_note(self, args):
@@ -249,9 +257,9 @@ class Bot:
     @_input_error
     def delete_note(self, args):
         TITLE = args[0]
-
-        self.notes.delete(TITLE)
-        print("Note deleted")
+        res = self.notes.delete(TITLE)
+        print(res)
+        print(f"Note was deleted")
 
     @_input_error
     def change_note_title(self, args):
@@ -292,14 +300,14 @@ class Bot:
 
     @_input_error
     def find_note_tag(self, args):
-        tags = args
+        tags = " ".join(args)
         res = self.notes.find_note_by_tag(tags)
         print(res)
 
     @_input_error
-    def sort_note_tag(self, args):
-        tags = args
-        print(tags)
+    def sort_note_tags(self, args):
+        res = self.notes.sort_note_by_tag_amount()
+        print(res)
 
 
 if __name__ == "__main__":
