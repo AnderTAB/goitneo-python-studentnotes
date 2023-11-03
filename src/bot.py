@@ -58,15 +58,15 @@ def _input_error(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            print(Fore.LIGHTMAGENTA_EX + "Wrong count of arguments")
+            return Fore.LIGHTMAGENTA_EX + "Wrong count of arguments"
         except TypeError:
-            print(Fore.LIGHTRED_EX + "TypeError")
+            return Fore.LIGHTRED_EX + "TypeError"
         except IndexError:
-            print(Fore.LIGHTRED_EX + "IndexError")
+            return Fore.LIGHTRED_EX + "IndexError"
         except AttributeError:
-            print(Fore.LIGHTRED_EX + "AttributeError")
+            return Fore.LIGHTRED_EX + "AttributeError"
         except:
-            print("Unknow Error")
+            return "Unknow Error"
 
     return inner
 
@@ -90,7 +90,9 @@ def helpBot():
 def add_contact(args):
     name, phone = args
     record = RecordContact(name)
+    print("ADD PHONE")
     record.add_phone(phone)
+    print("RECORD TIME")
     contacts.add_record(record)
     print("Contact added.")
 
@@ -268,6 +270,7 @@ def main():
         + "\n==============================\n Welcome to the assistant bot!\n\nI will help you with your student activity.\n==============================\n"
     )
     print(msg)
+    res = ""
 
     while True:
         # user_input = prompt(
@@ -280,56 +283,57 @@ def main():
         command, *args = _parse_input(user_input)
 
         if command in ["good bye", "close", "exit"]:
-            close_bot()
+            res = close_bot()
             break
         elif command == "hello":
-            helloBot()
+            res = helloBot()
         elif command == "help":
-            helpBot()
+            res = helpBot()
         elif command == "add_contact":
-            add_contact(args)
+            res = add_contact(args)
         elif command == "add_birthday":
-            add_birthday(args)
+            res = add_birthday(args)
         elif command == "delete_contact":
-            delete_contact(args)
+            res = delete_contact(args)
         elif command == "change_contact_phone":
-            change_contact_phone(args)
+            res = change_contact_phone(args)
         elif command == "find_contact":
-            find_contact(args)
+            res = find_contact(args)
         elif command == "all_contacts":
-            all_contacts()
+            res = all_contacts()
         elif command == "add_address":
-            add_address(args)
+            res = add_address(args)
         elif command == "change_address":
-            change_address(args)
+            res = change_address(args)
         elif command == "add_email":
-            add_email(args)
+            res = add_email(args)
         elif command == "change_email":
-            change_email(args)
+            res = change_email(args)
         elif command == "find_notes":
-            find_notes(args)
+            res = find_notes(args)
         elif command == "add_note":
-            add_note(args)
+            res = add_note(args)
         elif command == "delete_note":
-            delete_note(args)
+            res = delete_note(args)
         elif command == "change_note_title":
-            change_note_title(args)
+            res = change_note_title(args)
         elif command == "change_note_text":
-            change_note_text(args)
+            res = change_note_text(args)
         elif command == "add_note_tags":
-            add_note_tags(args)
+            res = add_note_tags(args)
         elif command == "delete_note_tag":
-            delete_note_tag(args)
+            res = delete_note_tag(args)
         elif command == "change_note_tag":
-            change_note_tag(args)
+            res = change_note_tag(args)
         elif command == "find_note_tag":
-            find_note_tag(args)
+            res = find_note_tag(args)
         elif command == "sort_note_tag":
-            sort_note_tag(args)
+            res = sort_note_tag(args)
         elif command == "contacts_birthdays":
-            contacts_birthdays(args)
+            res = contacts_birthdays(args)
         else:
-            print(Fore.RED + "Invalid command.")
+            res = Fore.RED + "Invalid command."
+    print(res)
 
 
 if __name__ == "__main__":
