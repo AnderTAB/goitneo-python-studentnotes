@@ -4,6 +4,9 @@ from prompt_toolkit.completion import WordCompleter
 from components.notes.notes import RecordNote, NoteData
 from components.contacts.contacts import RecordContact, AddressBook
 
+from colorama import *
+init(autoreset = True)
+
 COMMANDS = [
     "hello",
     "close",
@@ -44,8 +47,8 @@ FILENAME_NOTES = "data.csv"
 def _parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
-    if len(args) < 1:
-        print("Error: Command is missing required arguments.")
+    if len(args) < 1 and cmd not in ("hello","close","help",'all_contacts'):
+        print(Fore.LIGHTRED_EX + "Error: Command is missing required arguments.")
     return cmd, *args
 
 
@@ -54,13 +57,13 @@ def _input_error(func):
         try:
             return func(*args, **kwargs)
         except ValueError:
-            print("Wrong count of arguments")
+            print(Fore.LIGHTMAGENTA_EX + "Wrong count of arguments")
         except TypeError:
-            print("TypeError")
+            print(Fore.LIGHTRED_EX + "TypeError")
         except IndexError:
-            print("IndexError")
+            print(Fore.LIGHTRED_EX + "IndexError")
         except AttributeError:
-            print("AttributeError")
+            print(Fore.LIGHTRED_EX + "AttributeError")
         except:
             print("Unknow Error")
 
@@ -70,11 +73,11 @@ def _input_error(func):
 def close_bot():
     contacts.save_to_file(FILENAME_CONTACTS)
     notes.write_csv_file(FILENAME_NOTES)
-    print("Good bye!")
+    print(Fore.LIGHTYELLOW_EX + "Good bye!")
 
 
 def helloBot():
-    print("How can I help you?")
+    print(Fore.LIGHTYELLOW_EX + "How can I help you?")
 
 
 def helpBot():
@@ -114,7 +117,7 @@ def find_contact(args):
         for contact in found_contacts:
             print(contact)
     else:
-        print("No contacts found.")
+        print(Fore.LIGHTMAGENTA_EX + "No contacts found.")
 
 
 @_input_error
@@ -123,7 +126,6 @@ def add_address(args):
     contact = contacts.find(name)
     contact.add_address(address)
     print("Contact updated.")
-
 
 @_input_error
 def change_address(args):
@@ -146,8 +148,7 @@ def add_email(args):
 @_input_error
 def add_birthday(args):
     name, birthday = args
-    contact = contacts.find(name)
-    contact.add_birthday(birthday)
+    contacts.add_birthday(name,birthday)
     print("Birthday updated.")
 
 
@@ -161,13 +162,15 @@ def change_email(args):
 
 @_input_error
 def all_contacts():
-    print("All Contacts")  # Test print | Clean after
+    res = Fore.MAGENTA + "\nAll Contacts:\n" + Fore.WHITE
+    for key, value in contacts.items():
+        res += f"{key}: {value}\n"
+    print(res)
 
 
 @_input_error
 def contacts_birthdays(args):
-    days = int(args[0])
-    birthdays = contacts.birthdays(days)
+    birthdays = contacts.birthdays(args[0])
     print(birthdays)
 
 
@@ -258,7 +261,7 @@ def main():
     contacts.read_from_file(FILENAME_CONTACTS)
     notes.read_csv_file(FILENAME_NOTES)
 
-    msg = "\n==============================\nWelcome to the assistant bot!\n\nI will help you with your student activity.\n==============================\n"
+    msg = Fore.LIGHTGREEN_EX + "\n==============================\n Welcome to the assistant bot!\n\nI will help you with your student activity.\n==============================\n"
     print(msg)
 
     while True:
@@ -267,7 +270,7 @@ def main():
         # )
         # Advanced version for Tab Autocomplete
 
-        user_input = input("Enter a command: ")
+        user_input = input(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX)
         # Basic version for Testing
         command, *args = _parse_input(user_input)
 
@@ -321,7 +324,7 @@ def main():
         elif command == "contacts_birthdays":
             contacts_birthdays(args)
         else:
-            print("Invalid command.")
+            print(Fore.RED + "Invalid command.")
 
 
 if __name__ == "__main__":
