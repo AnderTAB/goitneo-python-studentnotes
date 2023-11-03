@@ -43,8 +43,8 @@ class Bot:
             "add_note_tags": self.add_note_tags,
             "delete_note_tag": self.delete_note_tag,
             "change_note_tag": self.change_note_tag,
-            "find_note_by_tag": self.find_note_tag,
-            "sort_note_by_tags": self.sort_note_tags,
+            "find_note_by_tag": self.find_note_by_tag,
+            "sort_note_by_tags": self.sort_note_by_tags,
         }
         self.commands_help = [
             "hello",
@@ -80,10 +80,10 @@ class Bot:
         self.contacts.read_from_file(self.FILENAME_CONTACTS)
         self.notes.read_csv_file(self.FILENAME_NOTES)
 
-        # COMMANDS_TEST = WordCompleter(
-        #     commands().keys(),
-        #     ignore_case=True,
-        # )
+        COMMANDS_TEST = WordCompleter(
+            self.commands.keys(),
+            ignore_case=True,
+        )
 
         msg = (
             Fore.LIGHTGREEN_EX
@@ -92,14 +92,11 @@ class Bot:
         print(msg)
         res = ""
         while True:
-            # user_input = prompt(
-            #     "Enter a command: ", completer=COMMANDS_TEST, complete_while_typing=False
-            # )
-            # Advanced version for Tab Autocomplete
-            user_input = input(
-                Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX
+            user_input = prompt(
+                print(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
+                completer=COMMANDS_TEST,
+                complete_while_typing=False,
             )
-            # Basic version for Testing
             command, *args = self._parse_input(user_input)
             if command in self.commands.keys() and command in [
                 "good bye",
@@ -125,6 +122,7 @@ class Bot:
             "help",
             "all_contacts",
             "all_notes",
+            "sort_note_by_tags",
         ):
             print(Fore.LIGHTRED_EX + "Error: Command is missing required arguments.")
         return cmd, *args
@@ -238,8 +236,12 @@ class Bot:
 
     @_input_error
     def all_notes(self, args):
-        res = self.notes.show_notes()
-        print(res)
+        res = list(self.notes.data.items())
+        if isinstance(res, list) and not None:
+            for r in res:
+                print(r)
+        else:
+            print(res)
 
     @_input_error
     def find_notes(self, args):
@@ -324,7 +326,7 @@ class Bot:
             print(res)
 
     @_input_error
-    def sort_note_by_tag(self):
+    def sort_note_by_tags(self):
         res = self.notes.sort_note_by_tag_amount()
         if isinstance(res, list):
             for r in res:
