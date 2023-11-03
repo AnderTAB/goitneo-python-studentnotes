@@ -16,40 +16,67 @@ class Bot:
         self.FILENAME_CONTACTS = "contacts.json"
         self.FILENAME_NOTES = "notes.csv"
 
-    # COMMANDS LIST
-    def commands(self):
-        return {
-            "hello": self.hello_bot(),
-            "close": self.close_bot(),
-            "good bye": self.close_bot(),
-            "exit": self.close_bot(),
-            "help": self.help_bot(),
-            "add_contact name phone": self.add_contact(),
-            "add_address name address": self.add_address(),
-            "add_email name email": self.add_email(),
-            "add_birthday name birthday(DD.MM.YYYY)": self.add_birthday(),
-            "change_address name new_address": self.change_address(),
-            "change_email name new_email": self.change_email(),
-            "change_contact_phone name phone": self.change_contact_phone(),
-            "delete_contact name": self.delete_contact(),
-            "all_contacts": self.all_contacts(),
-            "find_contact name || address || phone || email || birthday(DD.MM.YYYY)": self.find_contact(),
-            "contacts_birthdays days(int)": self.contacts_birthdays(),
-            "find_notes TITLE || text || date": self.find_notes(),
-            "add_note TITLE text *your #tags*": self.add_note(),
-            "delete_note TITLE": self.delete_note(),
-            "change_note_title TITLE NEW_TITLE": self.change_note_title(),
-            "change_note_text TITLE new_text": self.change_note_text(),
-            "add_note_tags TITLE *your tags*": self.add_note_tags(),
-            "delete_note_tag TITLE #Tag": self.delete_note_tag(),
-            "change_note_tag TITLE #tag #new_tag": self.change_note_tag(),
-            "find_note_tag *your #tags*": self.find_note_tag(),
-            "sort_note_tag *your #tags*": self.sort_note_tag(),
+        # COMMANDS LIST
+        self.commands = {
+            "hello": self.hello_bot,
+            "close": self.close_bot,
+            "good bye": self.close_bot,
+            "exit": self.close_bot,
+            "help": self.help_bot,
+            "add_contact": self.add_contact,
+            "add_address": self.add_address,
+            "add_email": self.add_email,
+            "add_birthday": self.add_birthday,
+            "change_address": self.change_address,
+            "change_email": self.change_email,
+            "change_contact_phone": self.change_contact_phone,
+            "delete_contact": self.delete_contact,
+            "all_contacts": self.all_contacts,
+            "find_contact": self.find_contact,
+            "contacts_birthdays": self.contacts_birthdays,
+            "find_notes": self.find_notes,
+            "add_note": self.add_note,
+            "delete_note": self.delete_note,
+            "change_note_title": self.change_note_title,
+            "change_note_text": self.change_note_text,
+            "add_note_tags": self.add_note_tags,
+            "delete_note_tag": self.delete_note_tag,
+            "change_note_tag": self.change_note_tag,
+            "find_note_tag": self.find_note_tag,
+            "sort_note_tag": self.sort_note_tag,
         }
+        self.commands_help = [
+            "hello",
+            "close",
+            "good bye",
+            "exit",
+            "help",
+            "add_contact name phone",
+            "add_address name address",
+            "add_email name email",
+            "add_birthday name birthday(DD.MM.YYYY)",
+            "change_address name new_address",
+            "change_email name new_email",
+            "change_contact_phone name phone",
+            "delete_contact name",
+            "all_contacts",
+            "find_contact name || address || phone || email || birthday(DD.MM.YYYY)",
+            "contacts_birthdays days(int)",
+            "find_notes TITLE || text || date",
+            "add_note TITLE text *your #tags*",
+            "delete_note TITLE",
+            "change_note_title TITLE NEW_TITLE",
+            "change_note_text TITLE new_text",
+            "add_note_tags TITLE *your tags*",
+            "delete_note_tag TITLE #Tag",
+            "change_note_tag TITLE #tag #new_tag",
+            "find_note_tag *your #tags*",
+            "sort_note_tag *your #tags*",
+        ]
 
     def run(self):
-        # self.contacts.read_from_file(self.FILENAME_CONTACTS)
-        # self.notes.read_csv_file(self.FILENAME_NOTES)
+        self.contacts.read_from_file(self.FILENAME_CONTACTS)
+        self.notes.read_csv_file(self.FILENAME_NOTES)
 
         # COMMANDS_TEST = WordCompleter(
         #     commands().keys(),
@@ -72,15 +99,15 @@ class Bot:
             )
             # Basic version for Testing
             command, *args = self._parse_input(user_input)
-            if command in self.commands().keys():
-                res = self.commands()[command](args)
-            elif command in self.commands().keys() and command in [
+            if command in self.commands.keys() and command in [
                 "good bye",
                 "close",
                 "exit",
             ]:
-                res = self.commands()[command](args)
+                res = self.commands[command](args)
                 break
+            elif command in self.commands.keys():
+                res = self.commands[command](args)
             else:
                 res = Fore.RED + "Invalid command."
         print(res)
@@ -116,19 +143,16 @@ class Bot:
 
         return inner
 
-    @_input_error
-    def close_bot(self):
-        # self.contacts.save_to_file(self.FILENAME_CONTACTS)
-        # self.notes.write_csv_file(self.FILENAME_NOTES)
-        print(Fore.LIGHTYELLOW_EX + "Good bye!")
+    def close_bot(self, args):
+        self.contacts.save_to_file(self.FILENAME_CONTACTS)
+        self.notes.write_csv_file(self.FILENAME_NOTES)
+        return Fore.LIGHTYELLOW_EX + "Good bye!"
 
-    @_input_error
-    def hello_bot(self):
+    def hello_bot(self, args):
         print(Fore.LIGHTYELLOW_EX + "How can I help you?")
 
-    @_input_error
-    def help_bot(self):
-        for i in self.commands():
+    def help_bot(self, args):
+        for i in self.commands_help:
             print(f"{i}")
 
     @_input_error
@@ -198,8 +222,7 @@ class Bot:
         res = contact.edit_email(email)
         print(res)
 
-    @_input_error
-    def all_contacts(self):
+    def all_contacts(self, args):
         res = Fore.MAGENTA + "\nAll Contacts:\n" + Fore.WHITE
         for key, value in self.contacts.items():
             res += f"{key}: {value}\n"
