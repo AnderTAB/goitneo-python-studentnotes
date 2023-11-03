@@ -42,8 +42,9 @@ class Bot:
             "add_note_tags": self.add_note_tags,
             "delete_note_tag": self.delete_note_tag,
             "change_note_tag": self.change_note_tag,
-            "find_note_tag": self.find_note_tag,
-            "sort_note_tag": self.sort_note_tag,
+            "find_note_by_tag": self.find_note_by_tag,
+            "sort_note_by_tag": self.sort_note_by_tag,
+            "show_notes": self.show_notes,
         }
         self.commands_help = [
             "hello",
@@ -67,21 +68,22 @@ class Bot:
             "delete_note TITLE",
             "change_note_title TITLE NEW_TITLE",
             "change_note_text TITLE new_text",
-            "add_note_tags TITLE *your tags*",
+            "add_note_tags TITLE *your #tags*",
             "delete_note_tag TITLE #Tag",
             "change_note_tag TITLE #tag #new_tag",
-            "find_note_tag *your #tags*",
-            "sort_note_tag *your #tags*",
+            "find_note_by_tag *your #tags*",
+            "sort_note_by_tag",
+            "show_notes",
         ]
 
     def run(self):
         self.contacts.read_from_file(self.FILENAME_CONTACTS)
         self.notes.read_csv_file(self.FILENAME_NOTES)
 
-        COMMANDS_TEST = WordCompleter(
-            self.commands.keys(),
-            ignore_case=True,
-        )
+        # COMMANDS_TEST = WordCompleter(
+        #     commands().keys(),
+        #     ignore_case=True,
+        # )
 
         msg = (
             Fore.LIGHTGREEN_EX
@@ -90,11 +92,14 @@ class Bot:
         print(msg)
         res = ""
         while True:
-            user_input = prompt(
-                print(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
-                completer=COMMANDS_TEST,
-                complete_while_typing=False,
+            # user_input = prompt(
+            #     "Enter a command: ", completer=COMMANDS_TEST, complete_while_typing=False
+            # )
+            # Advanced version for Tab Autocomplete
+            user_input = input(
+                Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX
             )
+            # Basic version for Testing
             command, *args = self._parse_input(user_input)
             if command in self.commands.keys() and command in [
                 "good bye",
@@ -232,8 +237,13 @@ class Bot:
 
     @_input_error
     def find_notes(self, args):
-        key = args[0]
-        # Code
+        key = " ".join(args)
+        found_notes = self.notes.find_note(key)
+        if isinstance(found_notes, list):
+            for f in found_notes:
+                print(f)
+        else:
+            print(found_notes)
 
     @_input_error
     def add_note(self, args):
@@ -244,14 +254,16 @@ class Bot:
         record.add_note(text)
         record.add_tag(tags)
         self.notes.add_record(record)
-        print("Note added")
+        print(record)
 
     @_input_error
     def delete_note(self, args):
         TITLE = args[0]
-
+        note = self.notes.find_note(TITLE)
         self.notes.delete(TITLE)
-        print("Note deleted")
+        message = str(note)
+        message += "Note deleted"
+        print(message)
 
     @_input_error
     def change_note_title(self, args):
@@ -266,7 +278,9 @@ class Bot:
 
         note = self.notes.find_note(TITLE)
         note.edit_note(new_text)
-        print("Note text changed")
+        message = str(note)
+        message += "Note text changed"
+        print(message)
 
     @_input_error
     def add_note_tags(self, args):
@@ -274,32 +288,52 @@ class Bot:
 
         note = self.notes.find_note(TITLE)
         note.add_tag(tags)
-        print("Note added")
+        t = " ".join(tags)
+        print(f"Note tag: {t} added")
 
     @_input_error
     def delete_note_tag(self, args):
         TITLE, tag = args
         note = self.notes.find_note(TITLE)
         note.del_tag(tag)
-        print("Note tag deleted")
+        print(f"Note tag: {tag} deleted")
 
     @_input_error
     def change_note_tag(self, args):
         TITLE, tag, new_tag = args
         note = self.notes.find_note(TITLE)
         note.edit_tag(tag, new_tag)
-        print("Note tag changed")
+        message = str(note)
+        message += "Note tag changed"
+        print(message)
 
     @_input_error
-    def find_note_tag(self, args):
-        tags = args
-        res = self.notes.find_note_by_tag(tags)
-        print(res)
+    def find_note_by_tag(self, args):
+        tag = " ".join(args)
+        res = self.notes.find_note_by_tag(tag)
+        if isinstance(res, list):
+            for r in res:
+                print(r)
+        else:
+            print(res)
 
     @_input_error
-    def sort_note_tag(self, args):
-        tags = args
-        print(tags)
+    def sort_note_by_tag(self):
+        res = self.notes.sort_note_by_tag_amount()
+        if isinstance(res, list):
+            for r in res:
+                print(r)
+        else:
+            print(res)
+
+    @_input_error
+    def show_notes(self):
+        res = self.notes.data.items()
+        if isinstance(res, list) and not None:
+            for r in res:
+                print(r)
+        else:
+            print(res)
 
 
 if __name__ == "__main__":
