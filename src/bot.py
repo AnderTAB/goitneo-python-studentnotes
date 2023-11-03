@@ -176,7 +176,8 @@ class Bot:
     @_input_error
     def delete_contact(self, args):
         name = args[0]
-        # СЩВУ
+        contact = self.notes.find_note(name)
+        contact.delete_contact(name)
         print("Contact deleted")
 
     @_input_error

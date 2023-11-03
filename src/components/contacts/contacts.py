@@ -221,7 +221,12 @@ class AddressBook(UserDict):
             res += f"{day}: {', '.join(map(str, names))}\n"
         return res
 
-    # пошук контакту за будь якою інформацією, поки не працює до кінця хзз чому
+    def delete_contact(self, name):
+        if name in self.data:
+            del self.data[name]
+        else:
+            raise ValueError(Fore.RED + "Contact not found")
+
     def search_contacts(self, query):
         found_contacts = []
         query = query.lower()
