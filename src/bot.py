@@ -90,9 +90,7 @@ def helpBot():
 def add_contact(args):
     name, phone = args
     record = RecordContact(name)
-    print("ADD PHONE")
     record.add_phone(phone)
-    print("RECORD TIME")
     contacts.add_record(record)
     print("Contact added.")
 
