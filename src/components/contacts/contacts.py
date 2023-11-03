@@ -5,7 +5,9 @@ import os.path
 import re
 
 from colorama import *
-init(autoreset = True)
+
+init(autoreset=True)
+
 
 class Field:
     def __init__(self, value):
@@ -108,9 +110,7 @@ class RecordContact:
         return f"Email updated to {new_email}"
 
     def __str__(self):
-        return (
-            f"Contact name: {self.name}, address: {self.address}, phone: {self.phone}, email: {self.email}, birthday: {self.birthday}"
-        )
+        return f"Contact name: {self.name}, address: {self.address}, phone: {self.phone}, email: {self.email}, birthday: {self.birthday}"
 
 
 class AddressBook(UserDict):
@@ -130,7 +130,12 @@ class AddressBook(UserDict):
             for el in self.data:
                 res = str(self.data[el]).replace(",", "").split()
                 data[res[2]] = [
-                    {"address": res[4], "phone": res[6], "email": res[8], "birthdate": res[10]}
+                    {
+                        "address": res[4],
+                        "phone": res[6],
+                        "email": res[8],
+                        "birthdate": res[10],
+                    }
                 ]
 
         with open(filename, "w") as file:

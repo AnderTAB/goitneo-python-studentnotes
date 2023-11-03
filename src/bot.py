@@ -5,7 +5,8 @@ from components.notes.notes import RecordNote, NoteData
 from components.contacts.contacts import RecordContact, AddressBook
 
 from colorama import *
-init(autoreset = True)
+
+init(autoreset=True)
 
 COMMANDS = [
     "hello",
@@ -40,14 +41,14 @@ COMMANDS_TEST = WordCompleter(
 
 contacts = AddressBook()
 notes = NoteData()
-FILENAME_CONTACTS = "data.json"
-FILENAME_NOTES = "data.csv"
+FILENAME_CONTACTS = "contacts.json"
+FILENAME_NOTES = "notes.csv"
 
 
 def _parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
-    if len(args) < 1 and cmd not in ("hello","close","help",'all_contacts'):
+    if len(args) < 1 and cmd not in ("hello", "close", "help", "all_contacts"):
         print(Fore.LIGHTRED_EX + "Error: Command is missing required arguments.")
     return cmd, *args
 
@@ -127,6 +128,7 @@ def add_address(args):
     contact.add_address(address)
     print("Contact updated.")
 
+
 @_input_error
 def change_address(args):
     name, address = args
@@ -148,7 +150,7 @@ def add_email(args):
 @_input_error
 def add_birthday(args):
     name, birthday = args
-    contacts.add_birthday(name,birthday)
+    contacts.add_birthday(name, birthday)
     print("Birthday updated.")
 
 
@@ -261,7 +263,10 @@ def main():
     contacts.read_from_file(FILENAME_CONTACTS)
     notes.read_csv_file(FILENAME_NOTES)
 
-    msg = Fore.LIGHTGREEN_EX + "\n==============================\n Welcome to the assistant bot!\n\nI will help you with your student activity.\n==============================\n"
+    msg = (
+        Fore.LIGHTGREEN_EX
+        + "\n==============================\n Welcome to the assistant bot!\n\nI will help you with your student activity.\n==============================\n"
+    )
     print(msg)
 
     while True:
