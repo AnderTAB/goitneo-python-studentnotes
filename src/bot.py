@@ -42,8 +42,9 @@ class Bot:
             "add_note_tags": self.add_note_tags,
             "delete_note_tag": self.delete_note_tag,
             "change_note_tag": self.change_note_tag,
-            "find_note_tag": self.find_note_tag,
-            "sort_note_tag": self.sort_note_tag,
+            "find_note_by_tag": self.find_note_by_tag,
+            "sort_note_by_tag": self.sort_note_by_tag,
+            "show_notes": self.show_notes,
         }
         self.commands_help = [
             "hello",
@@ -67,11 +68,12 @@ class Bot:
             "delete_note TITLE",
             "change_note_title TITLE NEW_TITLE",
             "change_note_text TITLE new_text",
-            "add_note_tags TITLE *your tags*",
+            "add_note_tags TITLE *your #tags*",
             "delete_note_tag TITLE #Tag",
             "change_note_tag TITLE #tag #new_tag",
-            "find_note_tag *your #tags*",
-            "sort_note_tag *your #tags*",
+            "find_note_by_tag *your #tags*",
+            "sort_note_by_tag",
+            "show_notes",
         ]
 
     def run(self):
@@ -235,8 +237,13 @@ class Bot:
 
     @_input_error
     def find_notes(self, args):
-        key = args[0]
-        # Code
+        key = "".join(args)
+        found_notes = self.notes.find_note(key)
+        if isinstance(found_notes, list):
+            for f in found_notes:
+                print(f)
+        else:
+            print(found_notes)
 
     @_input_error
     def add_note(self, args):
@@ -247,7 +254,7 @@ class Bot:
         record.add_note(text)
         record.add_tag(tags)
         self.notes.add_record(record)
-        print("Note added")
+        print(record)
 
     @_input_error
     def delete_note(self, args):
@@ -294,15 +301,32 @@ class Bot:
         print("Note tag changed")
 
     @_input_error
-    def find_note_tag(self, args):
-        tags = args
-        res = self.notes.find_note_by_tag(tags)
-        print(res)
+    def find_note_by_tag(self, args):
+        tag = str(args)
+        res = self.notes.find_note_by_tag(tag)
+        if isinstance(res, list):
+            for r in res:
+                print(r)
+        else:
+            print(res)
 
     @_input_error
-    def sort_note_tag(self, args):
-        tags = args
-        print(tags)
+    def sort_note_by_tag(self):
+        res = self.notes.sort_note_by_tag_amount()
+        if isinstance(res, list):
+            for r in res:
+                print(r)
+        else:
+            print(res)
+
+    @_input_error
+    def show_notes(self):
+        res = self.notes.data.items()
+        if isinstance(res, list) and not None:
+            for r in res:
+                print(r)
+        else:
+            print(res)
 
 
 if __name__ == "__main__":

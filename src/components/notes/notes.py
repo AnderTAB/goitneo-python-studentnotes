@@ -66,8 +66,8 @@ class RecordNote:
             for t in tags:
                 if t not in [t.text for t in self.tag]:
                     self.tag.append(Tag(t))
-        elif isinstance(tags, str) and len(re.findall(r"#\w+", tags)) > 1:
-            for t in re.findall(r"#\w+", tags):
+        elif isinstance(tags, str) and len(re.findall(r"\w+", tags)) > 1:
+            for t in re.findall(r"\w+", tags):
                 if t not in [t.text for t in self.tag]:
                     self.tag.append(Tag(t))
         else:
@@ -235,7 +235,7 @@ class NoteData(UserDict):
                 break
         return result if result is not None else None
 
-    def sort_note_by_tag_amount(self, reverse=False):
+    def sort_note_by_tag_amount(self, reverse=True):
         result = []
         result_dict = {}
         dict_data = self.to_dict()
@@ -322,7 +322,7 @@ class NoteData(UserDict):
         file = os.path.abspath(f"src/db/notes/{file}")
         field_names = ["title", "note", "tag", "date", "id"]
         users_list = self.to_dict()
-        with open(file, "w") as csvfile:
+        with open(file, "w", encoding='utf-8') as csvfile:
             writer = DictWriter(csvfile, fieldnames=field_names, delimiter=";")
             writer.writeheader()
             writer.writerows(users_list)
