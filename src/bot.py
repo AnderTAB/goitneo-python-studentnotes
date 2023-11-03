@@ -237,7 +237,7 @@ class Bot:
 
     @_input_error
     def find_notes(self, args):
-        key = "".join(args)
+        key = " ".join(args)
         found_notes = self.notes.find_note(key)
         if isinstance(found_notes, list):
             for f in found_notes:
@@ -259,9 +259,11 @@ class Bot:
     @_input_error
     def delete_note(self, args):
         TITLE = args[0]
-
+        note = self.notes.find_note(TITLE)
         self.notes.delete(TITLE)
-        print("Note deleted")
+        message = str(note)
+        message += "Note deleted"
+        print(message)
 
     @_input_error
     def change_note_title(self, args):
@@ -276,7 +278,9 @@ class Bot:
 
         note = self.notes.find_note(TITLE)
         note.edit_note(new_text)
-        print("Note text changed")
+        message = str(note)
+        message += "Note text changed"
+        print(message)
 
     @_input_error
     def add_note_tags(self, args):
@@ -284,25 +288,28 @@ class Bot:
 
         note = self.notes.find_note(TITLE)
         note.add_tag(tags)
-        print("Note added")
+        t = " ".join(tags)
+        print(f"Note tag: {t} added")
 
     @_input_error
     def delete_note_tag(self, args):
         TITLE, tag = args
         note = self.notes.find_note(TITLE)
         note.del_tag(tag)
-        print("Note tag deleted")
+        print(f"Note tag: {tag} deleted")
 
     @_input_error
     def change_note_tag(self, args):
         TITLE, tag, new_tag = args
         note = self.notes.find_note(TITLE)
         note.edit_tag(tag, new_tag)
-        print("Note tag changed")
+        message = str(note)
+        message += "Note tag changed"
+        print(message)
 
     @_input_error
     def find_note_by_tag(self, args):
-        tag = str(args)
+        tag = " ".join(args)
         res = self.notes.find_note_by_tag(tag)
         if isinstance(res, list):
             for r in res:
