@@ -1,4 +1,4 @@
-# goitneo-student_notes
+# MDS1-team2-student_notes
 
 ### Командний проект команди "2Left".
 
