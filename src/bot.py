@@ -95,11 +95,6 @@ class Bot:
                 completer=COMMANDS_TEST,
                 complete_while_typing=False,
             )
-            # Advanced version for Tab Autocomplete
-            # user_input = input(
-            #     Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX
-            # )
-            # Basic version for Testing
             command, *args = self._parse_input(user_input)
             if command in self.commands.keys() and command in [
                 "good bye",
