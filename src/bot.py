@@ -43,8 +43,8 @@ class Bot:
             "add_note_tags": self.add_note_tags,
             "delete_note_tag": self.delete_note_tag,
             "change_note_tag": self.change_note_tag,
-            "find_note_tag": self.find_note_tag,
-            "sort_note_tags": self.sort_note_tags,
+            "find_note_by_tag": self.find_note_tag,
+            "sort_note_by_tags": self.sort_note_tags,
         }
         self.commands_help = [
             "hello",
@@ -72,8 +72,8 @@ class Bot:
             "add_note_tags TITLE #tags",
             "delete_note_tag TITLE #Tag",
             "change_note_tag TITLE #tag #new_tag",
-            "find_note_tag #tags",
-            "sort_note_tags",
+            "find_note_by_tag #tags",
+            "sort_note_by_tags",
         ]
 
     def run(self):
@@ -240,8 +240,12 @@ class Bot:
     @_input_error
     def find_notes(self, args):
         key = " ".join(args)
-        res = self.notes.find_note(key)
-        print(res)
+        found_notes = self.notes.find_note(key)
+        if isinstance(found_notes, list):
+            for f in found_notes:
+                print(f)
+        else:
+            print(found_notes)
 
     @_input_error
     def add_note(self, args):
@@ -252,14 +256,16 @@ class Bot:
         record.add_note(text)
         record.add_tag(tags)
         self.notes.add_record(record)
-        print("Note added")
+        print(record)
 
     @_input_error
     def delete_note(self, args):
         TITLE = args[0]
-        res = self.notes.delete(TITLE)
-        print(res)
-        print(f"Note was deleted")
+        note = self.notes.find_note(TITLE)
+        self.notes.delete(TITLE)
+        message = str(note)
+        message += "Note deleted"
+        print(message)
 
     @_input_error
     def change_note_title(self, args):
@@ -274,7 +280,9 @@ class Bot:
 
         note = self.notes.find_note(TITLE)
         note.edit_note(new_text)
-        print("Note text changed")
+        message = str(note)
+        message += "Note text changed"
+        print(message)
 
     @_input_error
     def add_note_tags(self, args):
@@ -282,32 +290,43 @@ class Bot:
 
         note = self.notes.find_note(TITLE)
         note.add_tag(tags)
-        print("Note added")
+        t = " ".join(tags)
+        print(f"Note tag: {t} added")
 
     @_input_error
     def delete_note_tag(self, args):
         TITLE, tag = args
         note = self.notes.find_note(TITLE)
         note.del_tag(tag)
-        print("Note tag deleted")
+        print(f"Note tag: {tag} deleted")
 
     @_input_error
     def change_note_tag(self, args):
         TITLE, tag, new_tag = args
         note = self.notes.find_note(TITLE)
         note.edit_tag(tag, new_tag)
-        print("Note tag changed")
+        message = str(note)
+        message += "Note tag changed"
+        print(message)
 
     @_input_error
-    def find_note_tag(self, args):
-        tags = " ".join(args)
-        res = self.notes.find_note_by_tag(tags)
-        print(res)
+    def find_note_by_tag(self, args):
+        tag = " ".join(args)
+        res = self.notes.find_note_by_tag(tag)
+        if isinstance(res, list):
+            for r in res:
+                print(r)
+        else:
+            print(res)
 
     @_input_error
-    def sort_note_tags(self, args):
+    def sort_note_by_tag(self):
         res = self.notes.sort_note_by_tag_amount()
-        print(res)
+        if isinstance(res, list):
+            for r in res:
+                print(r)
+        else:
+            print(res)
 
 
 if __name__ == "__main__":

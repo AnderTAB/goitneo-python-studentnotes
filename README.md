@@ -42,8 +42,8 @@ py -m pip install colorama
 "add_note_tags TITLE #tags" - Додає теги до існуючої нотатки.
 "delete_note_tag TITLE #Tag" - Видаляє тег з існуючої нотатки за назвою.
 "change_note_tag TITLE #tag #new_tag" - Змінює тег в існуючій нотатці.
-"find_note_tag #tags" - Знаходить нотатки за заданими тегами.
-"sort_note_tags - Сортує нотатки за тегами.
+"find_note_by_tag #tags" - Знаходить нотатки за заданими тегами.
+"sort_note_by_tags - Сортує нотатки за тегами.
 
 # MIT License
 
@@ -104,8 +104,8 @@ Pressing "Tab" allows you to see a list of all commands, and after entering a pa
 "add_note_tags TITLE tags" - Adds tags to an existing note.
 "delete_note_tag TITLE #Tag" - Removes a tag from an existing note by title.
 "change_note_tag TITLE #tag #new_tag" - Changes a tag in an existing note.
-"find_note_tag #tags" - Finds notes with specified tags.
-"sort_note_tags" - Sorts notes by specified tags.
+"find_note_by_tag #tags" - Finds notes with specified tags.
+"sort_note_by_tags" - Sorts notes by specified tags.
 
 # MIT License
 
