@@ -255,12 +255,9 @@ class Bot:
 
     @_input_error
     def add_note(self, args):
-        TITLE, text, *tags = args
-
+        note = " ".join(args)
         record = RecordNote()
-        record.add_title(TITLE)
-        record.add_note(text)
-        record.add_tag(tags)
+        record.create_record(note)
         self.notes.add_record(record)
         print(record)
 
