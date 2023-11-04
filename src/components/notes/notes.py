@@ -322,7 +322,7 @@ class NoteData(UserDict):
         file = os.path.abspath(f"src/db/notes/{file}")
         field_names = ["title", "note", "tag", "date", "id"]
         users_list = self.to_dict()
-        with open(file, "w", encoding='utf-8') as csvfile:
+        with open(file, "w", encoding="utf-8") as csvfile:
             writer = DictWriter(csvfile, fieldnames=field_names, delimiter=";")
             writer.writeheader()
             writer.writerows(users_list)

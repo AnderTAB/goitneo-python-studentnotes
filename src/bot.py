@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from prompt_toolkit import prompt
+from prompt_toolkit import ANSI, prompt
 from prompt_toolkit.completion import WordCompleter
 
 from components.notes.notes import RecordNote, NoteData
@@ -94,9 +94,8 @@ class Bot:
         print(msg)
         res = ""
         while True:
-            # print(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
             user_input = prompt(
-                "Enter a command: ",
+                ANSI(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
                 completer=COMMANDS_TEST,
                 complete_while_typing=False,
             )
@@ -245,7 +244,7 @@ class Bot:
         res = self.notes.data
         if len(res) > 1 and not None:
             for name, record in res.items():
-                return(record)
+                return record
         else:
             return res
 
@@ -344,7 +343,7 @@ class Bot:
         res = self.notes.sort_note_by_tag_amount()
         if len(res) > 1:
             for name, record in res.items():
-                return(record)
+                return record
         else:
             return res
 
