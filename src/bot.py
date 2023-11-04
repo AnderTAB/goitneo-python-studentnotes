@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
@@ -240,10 +242,10 @@ class Bot:
 
     @_input_error
     def all_notes(self, args):
-        res = list(self.notes.data.items())
-        if isinstance(res, list) and not None:
-            for r in res:
-                return r
+        res = self.notes.data
+        if len(res) > 1 and not None:
+            for name, record in res.items():
+                return(record)
         else:
             return res
 
@@ -259,12 +261,9 @@ class Bot:
 
     @_input_error
     def add_note(self, args):
-        TITLE, text, *tags = args
-
+        note = " ".join(args)
         record = RecordNote()
-        record.add_title(TITLE)
-        record.add_note(text)
-        record.add_tag(tags)
+        record.create_record(note)
         self.notes.add_record(record)
         return record
 
@@ -286,7 +285,10 @@ class Bot:
 
     @_input_error
     def change_note_text(self, args):
-        TITLE, new_text = args
+        text = " ".join(args)
+        record = RecordNote()
+        TITLE = record.find_title_in_text(text)
+        new_text = record.find_note_in_text(text)
 
         note = self.notes.find_note(TITLE)
         note.edit_note(new_text)
@@ -296,8 +298,10 @@ class Bot:
 
     @_input_error
     def add_note_tags(self, args):
-        TITLE, *tags = args
-
+        text = " ".join(args)
+        record = RecordNote()
+        TITLE = record.find_title_in_text(text)
+        tags = record.find_tags_in_text(text)
         note = self.notes.find_note(TITLE)
         note.add_tag(tags)
         t = " ".join(tags)
@@ -305,14 +309,20 @@ class Bot:
 
     @_input_error
     def delete_note_tag(self, args):
-        TITLE, tag = args
+        text = " ".join(args)
+        record = RecordNote()
+        TITLE = record.find_title_in_text(text)
+        tag = " ".join(record.find_tags_in_text(text))
         note = self.notes.find_note(TITLE)
         note.del_tag(tag)
         return f"Note tag: {tag} deleted"
 
     @_input_error
     def change_note_tag(self, args):
-        TITLE, tag, new_tag = args
+        text = " ".join(args)
+        record = RecordNote()
+        TITLE = record.find_title_in_text(text)
+        tag, new_tag = record.find_tags_in_text(text)
         note = self.notes.find_note(TITLE)
         note.edit_tag(tag, new_tag)
         message = str(note)
@@ -330,11 +340,11 @@ class Bot:
             return res
 
     @_input_error
-    def sort_note_by_tags(self):
+    def sort_note_by_tags(self, args):
         res = self.notes.sort_note_by_tag_amount()
-        if isinstance(res, list):
-            for r in res:
-                return r
+        if len(res) > 1:
+            for name, record in res.items():
+                return(record)
         else:
             return res
 
