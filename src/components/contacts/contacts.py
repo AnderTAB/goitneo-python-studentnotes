@@ -185,7 +185,7 @@ class AddressBook(UserDict):
             print(Fore.RED + "Contact not found")
         else:
             contact.birthday = Birthday(birthday)
-            print("Birthday added.")
+            return "Birthday added."
 
     def show_birthday(self, name):
         for i in self.data:
@@ -219,7 +219,10 @@ class AddressBook(UserDict):
         res = Fore.MAGENTA + "\nAll Birthdays:\n" + Fore.WHITE
         for day, names in birthday_dict.items():
             res += f"{day}: {', '.join(map(str, names))}\n"
-        return res
+        if birthday_dict != {}:
+            return res
+        else:
+            return f"There will be {delta_days} in {diff[0]} days. \nNo contacts with this birthday were found."
 
     def delete_contact(self, name):
         if name in self.data:
