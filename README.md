@@ -17,7 +17,8 @@ py -m pip install colorama
 
 # Команди:
 
-"hello" - команда запускає бота та вітає користувача.
+py ./src/bot.py - команда запускає бота.
+"hello" - команда вітає користувача.
 "close" - Використовуйте цю команду для закриття бота та завершення сеансу.
 "good bye" - Використовуйте цю команду для закриття бота та завершення сеансу.
 "exit" - Використовуйте цю команду для закриття бота та завершення сеансу.
@@ -79,7 +80,8 @@ Pressing "Tab" allows you to see a list of all commands, and after entering a pa
 
 # Commands:
 
-"hello" - the command launches the bot and greets the user.
+py ./src/bot.py - the command launches the bot.
+"hello" - the command greets the user.
 "close" - Use this command to close the bot and end the session.
 "good bye" - Use this command to close the bot and end the session.
 "exit" - Use this command to close the bot and end the session.

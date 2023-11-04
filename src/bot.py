@@ -94,8 +94,9 @@ class Bot:
         print(msg)
         res = ""
         while True:
+            # print(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
             user_input = prompt(
-                print(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
+                "Enter a command: ",
                 completer=COMMANDS_TEST,
                 complete_while_typing=False,
             )
@@ -111,7 +112,7 @@ class Bot:
                 res = self.commands[command](args)
             else:
                 res = Fore.RED + "Invalid command."
-        print(res)
+            print(res)
 
     def _parse_input(self, user_input):
         cmd, *args = user_input.split()
@@ -152,33 +153,36 @@ class Bot:
         return Fore.LIGHTYELLOW_EX + "Good bye!"
 
     def hello_bot(self, args):
-        print(Fore.LIGHTYELLOW_EX + "How can I help you?")
+        return Fore.LIGHTYELLOW_EX + "How can I help you?"
 
     def help_bot(self, args):
+        res = ""
         for i in self.commands_help:
-            print(f"{i}")
+            res += f"{i}\n"
+        return res
 
     @_input_error
     def add_contact(self, args):
         name, phone = args
+
         record = RecordContact(name)
         record.add_phone(phone)
         self.contacts.add_record(record)
-        print("Contact added.")
+        return "Contact added."
 
     @_input_error
     def change_contact_phone(self, args):
         name, phone = args
         contact = self.contacts.find(name)
         res = contact.edit_phone(phone)
-        print(res)
+        return res
 
     @_input_error
     def delete_contact(self, args):
         name = args[0]
         contact = self.notes.find_note(name)
         contact.delete_contact(name)
-        print("Contact deleted")
+        return "Contact deleted"
 
     @_input_error
     def find_contact(self, args):
@@ -186,23 +190,23 @@ class Bot:
         found_contacts = self.contacts.search_contacts(name)
         if found_contacts:
             for contact in found_contacts:
-                print(contact)
+                return contact
         else:
-            print(Fore.LIGHTMAGENTA_EX + "No contacts found.")
+            return Fore.LIGHTMAGENTA_EX + "No contacts found."
 
     @_input_error
     def add_address(self, args):
         name, address = args
         contact = self.contacts.find(name)
         contact.add_address(address)
-        print("Contact updated.")
+        return "Contact updated."
 
     @_input_error
     def change_address(self, args):
         name, address = args
         contact = self.contacts.find(name)
         res = contact.edit_address(address)
-        print(res)
+        return res
 
     @_input_error
     def add_email(self, args):
@@ -211,7 +215,7 @@ class Bot:
         contact = self.contacts.find(name)
         contact.add_email(email)
 
-        print("Email updated.")
+        return "Email updated."
 
     @_input_error
     def add_birthday(self, args):
@@ -223,27 +227,27 @@ class Bot:
         name, email = args
         contact = self.contacts.find(name)
         res = contact.edit_email(email)
-        print(res)
+        return res
 
     def all_contacts(self, args):
         res = Fore.MAGENTA + "\nAll Contacts:\n" + Fore.WHITE
         for key, value in self.contacts.items():
             res += f"{key}: {value}\n"
-        print(res)
+        return res
 
     @_input_error
     def contacts_birthdays(self, args):
         birthdays = self.contacts.birthdays(args[0])
-        print(birthdays)
+        return birthdays
 
     @_input_error
     def all_notes(self, args):
         res = self.notes.data
         if len(res) > 1 and not None:
             for name, record in res.items():
-                print(record)
+                return(record)
         else:
-            print(res)
+            return res
 
     @_input_error
     def find_notes(self, args):
@@ -251,9 +255,9 @@ class Bot:
         found_notes = self.notes.find_note(key)
         if isinstance(found_notes, list):
             for f in found_notes:
-                print(f)
+                return f
         else:
-            print(found_notes)
+            return found_notes
 
     @_input_error
     def add_note(self, args):
@@ -261,7 +265,7 @@ class Bot:
         record = RecordNote()
         record.create_record(note)
         self.notes.add_record(record)
-        print(record)
+        return record
 
     @_input_error
     def delete_note(self, args):
@@ -270,14 +274,14 @@ class Bot:
         self.notes.delete(TITLE)
         message = str(note)
         message += "Note deleted"
-        print(message)
+        return message
 
     @_input_error
     def change_note_title(self, args):
         TITLE, NEW_TITLE = args
         note = self.notes.find_note(TITLE)
         note.edit_title(NEW_TITLE)
-        print("Note Title changed")
+        return "Note Title changed"
 
     @_input_error
     def change_note_text(self, args):
@@ -290,7 +294,7 @@ class Bot:
         note.edit_note(new_text)
         message = str(note)
         message += "Note text changed"
-        print(message)
+        return message
 
     @_input_error
     def add_note_tags(self, args):
@@ -301,7 +305,7 @@ class Bot:
         note = self.notes.find_note(TITLE)
         note.add_tag(tags)
         t = " ".join(tags)
-        print(f"Note tag: {t} added")
+        return f"Note tag: {t} added"
 
     @_input_error
     def delete_note_tag(self, args):
@@ -311,7 +315,7 @@ class Bot:
         tag = " ".join(record.find_tags_in_text(text))
         note = self.notes.find_note(TITLE)
         note.del_tag(tag)
-        print(f"Note tag: {tag} deleted")
+        return f"Note tag: {tag} deleted"
 
     @_input_error
     def change_note_tag(self, args):
@@ -323,7 +327,7 @@ class Bot:
         note.edit_tag(tag, new_tag)
         message = str(note)
         message += "Note tag changed"
-        print(message)
+        return message
 
     @_input_error
     def find_note_by_tag(self, args):
@@ -331,18 +335,18 @@ class Bot:
         res = self.notes.find_note_by_tag(tag)
         if isinstance(res, list):
             for r in res:
-                print(r)
+                return r
         else:
-            print(res)
+            return res
 
     @_input_error
     def sort_note_by_tags(self, args):
         res = self.notes.sort_note_by_tag_amount()
         if len(res) > 1:
             for name, record in res.items():
-                print(record)
+                return(record)
         else:
-            print(res)
+            return res
 
 
 if __name__ == "__main__":
