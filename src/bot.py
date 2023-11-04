@@ -92,8 +92,9 @@ class Bot:
         print(msg)
         res = ""
         while True:
+            # print(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
             user_input = prompt(
-                print(Fore.LIGHTBLUE_EX + "Enter a command: " + Fore.LIGHTWHITE_EX),
+                "Enter a command: ",
                 completer=COMMANDS_TEST,
                 complete_while_typing=False,
             )
