@@ -242,7 +242,6 @@ class AddressBook(UserDict):
         found_contacts = []
         query = query.lower()
 
-        print(self.data)
         for name, contact in self.data.items():
             contact_info = {
                 "name": contact.name.value.lower(),
