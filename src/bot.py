@@ -149,7 +149,7 @@ class Bot:
     def close_bot(self, args):
         self.contacts.save_to_file(self.FILENAME_CONTACTS)
         self.notes.write_csv_file(self.FILENAME_NOTES)
-        return Fore.LIGHTYELLOW_EX + "Good bye!"
+        print(Fore.LIGHTYELLOW_EX + "Good bye!")
 
     def hello_bot(self, args):
         return Fore.LIGHTYELLOW_EX + "How can I help you?"
@@ -179,8 +179,7 @@ class Bot:
     @_input_error
     def delete_contact(self, args):
         name = args[0]
-        contact = self.notes.find_note(name)
-        contact.delete_contact(name)
+        self.contacts.delete_contact(name)
         return "Contact deleted"
 
     @_input_error
@@ -219,7 +218,8 @@ class Bot:
     @_input_error
     def add_birthday(self, args):
         name, birthday = args
-        self.contacts.add_birthday(name, birthday)
+        res = self.contacts.add_birthday(name, birthday)
+        return res
 
     @_input_error
     def change_email(self, args):

@@ -76,8 +76,12 @@ class Birthday(Field):
     DATE_FORMAT = "%d.%m.%Y"
 
     def __init__(self, value):
-        date_obj = datetime.strptime(value, self.DATE_FORMAT)
-        super().__init__(date_obj.date())
+        if value == "None":
+            super().__init__("None")
+        else:
+            date_obj = datetime.strptime(value, self.DATE_FORMAT)
+            formatted_date = date_obj.strftime(self.DATE_FORMAT)
+            super().__init__(formatted_date)
 
     def __lt__(self, other):
         if isinstance(other, Birthday):
@@ -89,10 +93,10 @@ class Birthday(Field):
 
 
 class RecordContact:
-    def __init__(self, name, address=None, email=None):
+    def __init__(self, name, address=None, email=None, birthday="None"):
         self.name = Name(name)
         self.phone = ""
-        self.birthday = "None"
+        self.birthday = Birthday(birthday)
         self.address = Address(address) if address else address
         self.email = Email(email) if email else email
 
@@ -160,17 +164,16 @@ class AddressBook(UserDict):
                     self.phone = value[0]["phone"]
                     email = value[0]["email"]
                     if value[0]["birthdate"] != "None":
-                        date = str(value[0]["birthdate"]).split("-")
-                        birthday = f"{date[2]}.{date[1]}.{date[0]}"
+                        birthday = value[0]["birthdate"]
                     else:
-                        birthday = None
+                        birthday = "None"
                     record = RecordContact(key)
                     record.add_address(self.address)
                     record.add_phone(self.phone)
                     if email != None:
                         record.email = email
                     if birthday != None:
-                        record.birthday = Birthday(birthday)
+                        record.birthday = birthday
                     self.data[key] = record
 
         except FileNotFoundError:
