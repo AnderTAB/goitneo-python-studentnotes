@@ -3,7 +3,7 @@
 from prompt_toolkit import ANSI, prompt
 from prompt_toolkit.completion import WordCompleter
 
-from components.notes.notes import RecordNote, NoteData
+from components.notes.notes import RecordNote, NoteData, Finder
 from components.contacts.contacts import RecordContact, AddressBook
 
 from colorama import *
@@ -15,6 +15,7 @@ class Bot:
     def __init__(self):
         self.contacts = AddressBook()
         self.notes = NoteData()
+        self.finder = Finder()
         self.FILENAME_CONTACTS = "contacts.json"
         self.FILENAME_NOTES = "notes.csv"
 
@@ -242,110 +243,120 @@ class Bot:
     @_input_error
     def all_notes(self, args):
         res = self.notes.data
-        if len(res) > 1 and not None:
-            for name, record in res.items():
-                return record
+        if len(res) > 1:
+            for id, r in res.items():
+                print(r)
         else:
-            return res
+            print(res)
 
     @_input_error
     def find_notes(self, args):
         key = " ".join(args)
         found_notes = self.notes.find_note(key)
         if isinstance(found_notes, list):
-            for f in found_notes:
-                return f
+            for record in found_notes:
+                print(record)
+        elif isinstance(found_notes, object):
+            print(found_notes)
         else:
-            return found_notes
+            print(f"No note with key: {key} found.")
 
     @_input_error
     def add_note(self, args):
-        note = " ".join(args)
+        text = " ".join(args)
         record = RecordNote()
-        record.create_record(note)
+        record.create_record(text)
         self.notes.add_record(record)
-        return record
+        print(record)
 
     @_input_error
     def delete_note(self, args):
-        TITLE = args[0]
+        message = ""
+        TITLE = " ".join(args)
         note = self.notes.find_note(TITLE)
-        self.notes.delete(TITLE)
-        message = str(note)
-        message += "Note deleted"
-        return message
+        if isinstance(note, list):
+            print(f"Found {len(note)} with {TITLE}.\n")
+            for record in note:
+                self.notes.delete(record.id.text)
+                message += str(record)
+                message += "Note deleted \n"
+            print(message)
+        elif isinstance(note, object):
+            self.notes.delete(TITLE)
+            message += str(note)
+            message += "Note deleted \n"
+            print(message)
+        else:
+            print(f"No note with title: {TITLE} found.")
 
     @_input_error
     def change_note_title(self, args):
         TITLE, NEW_TITLE = args
         note = self.notes.find_note(TITLE)
         note.edit_title(NEW_TITLE)
-        return "Note Title changed"
+        print("Note Title changed \n")
 
     @_input_error
     def change_note_text(self, args):
         text = " ".join(args)
-        record = RecordNote()
-        TITLE = record.find_title_in_text(text)
-        new_text = record.find_note_in_text(text)
-
+        TITLE = self.finder.find_title_in_text(text)
+        new_text = self.finder.find_note_in_text(text)
         note = self.notes.find_note(TITLE)
         note.edit_note(new_text)
         message = str(note)
-        message += "Note text changed"
-        return message
+        message += "Note text changed \n"
+        print(message)
 
     @_input_error
     def add_note_tags(self, args):
         text = " ".join(args)
-        record = RecordNote()
-        TITLE = record.find_title_in_text(text)
-        tags = record.find_tags_in_text(text)
+        TITLE = self.finder.find_title_in_text(text)
+        tags = self.finder.find_tags_in_text(text)
         note = self.notes.find_note(TITLE)
         note.add_tag(tags)
         t = " ".join(tags)
-        return f"Note tag: {t} added"
+        print(f"Note tag: {t} added \n")
 
     @_input_error
     def delete_note_tag(self, args):
         text = " ".join(args)
-        record = RecordNote()
-        TITLE = record.find_title_in_text(text)
-        tag = " ".join(record.find_tags_in_text(text))
+        TITLE = self.finder.find_title_in_text(text)
+        tag = " ".join(self.finder.find_tags_in_text(text))
         note = self.notes.find_note(TITLE)
         note.del_tag(tag)
-        return f"Note tag: {tag} deleted"
+        print(f"Note tag: {tag} deleted")
 
     @_input_error
     def change_note_tag(self, args):
         text = " ".join(args)
-        record = RecordNote()
-        TITLE = record.find_title_in_text(text)
-        tag, new_tag = record.find_tags_in_text(text)
+        TITLE = self.finder.find_title_in_text(text)
+        tag, new_tag = self.finder.find_tags_in_text(text)
         note = self.notes.find_note(TITLE)
         note.edit_tag(tag, new_tag)
         message = str(note)
         message += "Note tag changed"
-        return message
+        print(message)
 
     @_input_error
     def find_note_by_tag(self, args):
         tag = " ".join(args)
         res = self.notes.find_note_by_tag(tag)
         if isinstance(res, list):
-            for r in res:
-                return r
+            for id, r in res.items():
+                print(r)
+        elif isinstance(res, object):
+            print(res)
         else:
-            return res
+            print(f"No note with tag: {tag} found.")
 
     @_input_error
     def sort_note_by_tags(self, args):
         res = self.notes.sort_note_by_tag_amount()
         if len(res) > 1:
-            for name, record in res.items():
-                return record
+            for id, r in res.items():
+                print(r)
         else:
-            return res
+            print(res)
 
 
 if __name__ == "__main__":

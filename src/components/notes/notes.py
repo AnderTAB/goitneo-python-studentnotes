@@ -37,6 +37,36 @@ class ID(Field):
         self.text = str(id)
 
 
+class Finder:
+    def find_title_in_text(self, text):
+        try:
+            title = re.findall(r"(?<!#)\b[A-Z]+\b", text)
+            return " ".join(title)
+        except ValueError:
+            print("No title found")
+            return []
+
+    def find_tags_in_text(self, text):
+        try:
+            tags = re.findall(r"#\w+", text)
+            return tags
+        except ValueError:
+            print("No tags found")
+            return []
+
+    def find_note_in_text(self, text):
+        try:
+            pattern = re.compile(r"(?<!#)\b[A-Z]+\b")
+            text = pattern.sub("", text)
+            pattern = re.compile(r"#\w+")
+            text = pattern.sub("", text)
+            note = re.findall(r"\b\S.[^ ]*\b", text)
+            return " ".join(note)
+        except ValueError:
+            print("No note found")
+            return []
+
+
 class RecordNote:
     current_id = int(1)
 
@@ -45,6 +75,7 @@ class RecordNote:
         self.tag = []
         self.note = None
         self.notebook = NoteData()
+        self.finder = Finder()
         self.date = datetime.now().strftime("%d.%m.%Y %H:%M")
         if RecordNote.current_id not in self.notebook.get_id_list():
             self.id = ID(RecordNote.current_id)
@@ -101,37 +132,9 @@ class RecordNote:
                 self.tag.remove(tag)
 
     def create_record(self, text):
-        self.add_title(self.find_title_in_text(text))
-        self.add_tag(self.find_tags_in_text(text))
-        self.add_note(self.find_note_in_text(text))
-
-    def find_title_in_text(self, text):
-        try:
-            title = re.findall(r"(?<!#)\b[A-Z]+\b", text)
-            return " ".join(title)
-        except ValueError:
-            print("No title found")
-            return []
-
-    def find_tags_in_text(self, text):
-        try:
-            tags = re.findall(r"#\w+", text)
-            return tags
-        except ValueError:
-            print("No tags found")
-            return []
-
-    def find_note_in_text(self, text):
-        try:
-            pattern = re.compile(r"(?<!#)\b[A-Z]+\b")
-            text = pattern.sub("", text)
-            pattern = re.compile(r"#\w+")
-            text = pattern.sub("", text)
-            note = re.findall(r"\b\S.[^ ]*\b", text)
-            return " ".join(note)
-        except ValueError:
-            print("No note found")
-            return []
+        self.add_title(self.finder.find_title_in_text(text))
+        self.add_tag(self.finder.find_tags_in_text(text))
+        self.add_note(self.finder.find_note_in_text(text))
 
     def __str__(self) -> str:
         message = ("-" * 103) + "\n"
@@ -155,7 +158,7 @@ class RecordNote:
 
 class NoteData(UserDict):
     def add_record(self, note):
-        self.data[note.title.text] = note
+        self.data[note.id.text] = note
 
     def get_id_list(self):
         dict_data = self.to_dict()
