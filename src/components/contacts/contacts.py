@@ -137,11 +137,11 @@ class AddressBook(UserDict):
                 json.dump(bd, file)
 
         with open(filename) as file:
-            data = json.load(file)
+            # data = json.load(file)
             record = {}
             for el in self.data:
                 res = str(self.data[el]).replace(",", "").split()
-                data[res[2]] = [
+                record[res[2]] = [
                     {
                         "address": res[4],
                         "phone": res[6],
@@ -151,7 +151,7 @@ class AddressBook(UserDict):
                 ]
 
         with open(filename, "w") as file:
-            json.dump(data, file, indent=2)
+            json.dump(record, file, indent=2)
 
     def read_from_file(self, file):
         filename = os.path.abspath(f"src/db/contacts/{file}")
@@ -213,20 +213,18 @@ class AddressBook(UserDict):
             birthday = user.birthday
             if birthday == "None":
                 continue
-            birthday = birthday.value
+            birthday = datetime.strptime(birthday, Birthday.DATE_FORMAT).date()
             birthday_this_year = birthday.replace(year=current_date.year)
+
             if birthday_this_year < current_date:
                 birthday_this_year = birthday.replace(year=next_year)
-
-            delta_days = current_date + timedelta(days=int(diff[0]))
-
+            delta_days = current_date + timedelta(days=int(diff))
             if birthday_this_year == delta_days:
                 weekday = birthday_this_year.strftime("%A")
                 if weekday in birthday_dict:
                     birthday_dict[weekday] += [user.name]
                 else:
                     birthday_dict[weekday] = [user.name]
-
         res = Fore.MAGENTA + "\nAll Birthdays:\n" + Fore.WHITE
         for day, names in birthday_dict.items():
             res += f"{day}: {', '.join(map(str, names))}\n"
