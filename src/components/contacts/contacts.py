@@ -241,7 +241,6 @@ class AddressBook(UserDict):
     def search_contacts(self, query):
         found_contacts = []
         query = query.lower()
-
         for name, contact in self.data.items():
             contact_info = {
                 "name": contact.name.value.lower(),
@@ -250,16 +249,14 @@ class AddressBook(UserDict):
                 "address": contact.address,
                 "email": contact.email,
             }
-
-            if query in contact_info["name"]:
+            if query == contact_info["name"]:
                 found_contacts.append(contact)
-            if query in contact_info["email"]:
+            if query == contact_info["email"]:
                 found_contacts.append(contact)
-            if query in contact_info["address"]:
+            if query == contact_info["address"]:
                 found_contacts.append(contact)
-            if query in contact_info["phone"]:
+            if query == contact_info["phone"]:
                 found_contacts.append(contact)
-            if query in contact_info["birthday"]:
+            if query == contact_info["birthday"]:
                 found_contacts.append(contact)
-
         return found_contacts
