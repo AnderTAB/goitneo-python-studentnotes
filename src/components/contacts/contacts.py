@@ -137,11 +137,11 @@ class AddressBook(UserDict):
                 json.dump(bd, file)
 
         with open(filename) as file:
-            data = json.load(file)
+            # data = json.load(file)
             record = {}
             for el in self.data:
                 res = str(self.data[el]).replace(",", "").split()
-                data[res[2]] = [
+                record[res[2]] = [
                     {
                         "address": res[4],
                         "phone": res[6],
@@ -151,7 +151,7 @@ class AddressBook(UserDict):
                 ]
 
         with open(filename, "w") as file:
-            json.dump(data, file, indent=2)
+            json.dump(record, file, indent=2)
 
     def read_from_file(self, file):
         filename = os.path.abspath(f"src/db/contacts/{file}")
