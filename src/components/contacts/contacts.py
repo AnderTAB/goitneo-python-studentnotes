@@ -9,6 +9,14 @@ from colorama import *
 init(autoreset=True)
 
 
+class InvalidValueError(Exception):
+    pass
+
+
+class NotFoundError(Exception):
+    pass
+
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -33,7 +41,7 @@ class Phone(Field):
         if value.isdigit() and len(value) == 10:
             super().__init__(value)
         else:
-            raise ValueError(Fore.RED + "Invalid phone number")
+            raise InvalidValueError(Fore.RED + "Invalid phone number")
 
 
 class Email(Field):
@@ -41,7 +49,7 @@ class Email(Field):
         if self.is_valid(value):
             super().__init__(value)
         else:
-            raise ValueError(Fore.RED + "Invalid email address")
+            raise InvalidValueError(Fore.RED + "Invalid email address")
 
     @staticmethod
     def is_valid(value):
@@ -55,7 +63,7 @@ class Address(Field):
         if self.is_valid2(value):
             super().__init__(value)
         else:
-            raise ValueError(Fore.RED + "Invalid address")
+            raise InvalidValueError(Fore.RED + "Invalid address")
 
     @staticmethod
     def is_valid2(value):
@@ -92,21 +100,21 @@ class RecordContact:
         self.phone = Phone(value)
 
     def edit_phone(self, new_phone):
-        self.phone = new_phone
+        self.phone = Phone(new_phone)
         return f"Phone number updated to {new_phone}"
 
     def add_address(self, value):
         self.address = Address(value)
 
     def edit_address(self, new_address):
-        self.address = new_address
+        self.address = Address(new_address)
         return f"Address updated to {new_address}"
 
     def add_email(self, value):
         self.email = Email(value)
 
     def edit_email(self, new_email):
-        self.email = new_email
+        self.email = Email(new_email)
         return f"Email updated to {new_email}"
 
     def __str__(self):
@@ -176,13 +184,13 @@ class AddressBook(UserDict):
         if res:
             return res
         else:
-            raise ValueError(Fore.RED + "Contact not found")
+            raise NotFoundError(Fore.RED + "Contact not found")
 
     def add_birthday(self, name, birthday):
         try:
             contact = self.find(name)
         except ValueError:
-            print(Fore.RED + "Contact not found")
+            raise NotFoundError(Fore.RED + "Contact not found")
         else:
             contact.birthday = Birthday(birthday)
             return "Birthday added."
@@ -192,7 +200,7 @@ class AddressBook(UserDict):
             if i == name:
                 return self.data[i].birthday
             else:
-                raise ValueError(Fore.RED + "Contact not found")
+                raise NotFoundError(Fore.RED + "Contact not found")
 
     def birthdays(self, diff):
         birthday_dict = {}
@@ -228,7 +236,7 @@ class AddressBook(UserDict):
         if name in self.data:
             del self.data[name]
         else:
-            raise ValueError(Fore.RED + "Contact not found")
+            raise NotFoundError(Fore.RED + "Contact not found")
 
     def search_contacts(self, query):
         found_contacts = []
@@ -239,8 +247,8 @@ class AddressBook(UserDict):
                 "name": contact.name.value.lower(),
                 "phone": contact.phone.value,
                 "birthday": contact.birthday,
-                "address": contact.address.value,
-                "email": contact.email.value,
+                "address": contact.address,
+                "email": contact.email,
             }
 
             if query in contact_info["name"]:

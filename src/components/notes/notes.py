@@ -5,6 +5,10 @@ import re
 import os
 
 
+class TextLimitError(Exception):
+    pass
+
+
 class Field:
     def __init__(self, text):
         self.text = text
@@ -78,18 +82,18 @@ class RecordNote:
         if len(note) <= 256:
             self.note = Notation(note)
         else:
-            raise ValueError("Too mach symbols. 256 symbols are allowed")
+            raise TextLimitError("Too mach symbols. 256 symbols are allowed")
 
     def edit_note(self, new_note):
-        self.add_note(new_note)
+        self.add_note(Notation(new_note))
 
     def edit_title(self, new_title):
-        self.add_title(new_title)
+        self.add_title(Title(new_title))
 
     def edit_tag(self, old_tag, new_tag):
         for tag in self.tag:
             if tag.text == old_tag:
-                tag.text = new_tag
+                tag.text = Tag(new_tag)
 
     def del_tag(self, tag_to_delete):
         for tag in self.tag:
@@ -192,7 +196,7 @@ class NoteData(UserDict):
             else:
                 return []
         else:
-            raise ValueError("Search word schud have at least 3 characters")
+            raise TextLimitError("Search word schud have at least 3 characters")
 
     def find_note_by_tag(self, tag):
         result = []
