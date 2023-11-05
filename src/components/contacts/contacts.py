@@ -213,20 +213,18 @@ class AddressBook(UserDict):
             birthday = user.birthday
             if birthday == "None":
                 continue
-            birthday = birthday.value
+            birthday = datetime.strptime(birthday, Birthday.DATE_FORMAT).date()
             birthday_this_year = birthday.replace(year=current_date.year)
+
             if birthday_this_year < current_date:
                 birthday_this_year = birthday.replace(year=next_year)
-
-            delta_days = current_date + timedelta(days=int(diff[0]))
-
+            delta_days = current_date + timedelta(days=int(diff))
             if birthday_this_year == delta_days:
                 weekday = birthday_this_year.strftime("%A")
                 if weekday in birthday_dict:
                     birthday_dict[weekday] += [user.name]
                 else:
                     birthday_dict[weekday] = [user.name]
-
         res = Fore.MAGENTA + "\nAll Birthdays:\n" + Fore.WHITE
         for day, names in birthday_dict.items():
             res += f"{day}: {', '.join(map(str, names))}\n"
