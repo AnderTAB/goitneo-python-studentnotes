@@ -100,21 +100,21 @@ class RecordContact:
         self.phone = Phone(value)
 
     def edit_phone(self, new_phone):
-        self.phone = new_phone
+        self.phone = Phone(new_phone)
         return f"Phone number updated to {new_phone}"
 
     def add_address(self, value):
         self.address = Address(value)
 
     def edit_address(self, new_address):
-        self.address = new_address
+        self.address = Address(new_address)
         return f"Address updated to {new_address}"
 
     def add_email(self, value):
         self.email = Email(value)
 
     def edit_email(self, new_email):
-        self.email = new_email
+        self.email = Email(new_email)
         return f"Email updated to {new_email}"
 
     def __str__(self):
@@ -242,6 +242,7 @@ class AddressBook(UserDict):
         found_contacts = []
         query = query.lower()
 
+        print(self.data)
         for name, contact in self.data.items():
             contact_info = {
                 "name": contact.name.value.lower(),
